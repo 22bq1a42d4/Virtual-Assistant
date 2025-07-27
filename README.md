@@ -1,4 +1,21 @@
-<p align="center"> <a href="https://en.wikipedia.org/wiki/Virtual_assistant" target="_blank"> <img src="https://cdn-icons-png.flaticon.com/512/4712/4712006.png" alt="Realistic Robot" width="120" style="border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);" /> </a> </p> <h1 align="center" style="font-family:Arial, sans-serif;"><strong>Virtual Assistant</strong></h1> <p align="center" style="max-width:800px; margin:auto; font-family:Arial, sans-serif; line-height:1.5;"> A locally-hosted, AI-powered assistant designed for deep conversational intelligence with features like <strong>voice interface</strong>, <strong>image-aware reasoning</strong>, and automated <strong>customer support simulations</strong>. Built using <a href="https://ollama.com/library/llama3" target="_blank"><strong>LLaMA 3</strong></a> and <a href="https://ollama.com/library/llava" target="_blank"><strong>LLaVA</strong></a>, this assistant serves as a high‑quality, multimodal AI agent. </p>
+<table>
+  <tr>
+    <td width="60">
+      <img src="assets/robot_intro.jpg" alt="Project Icon" width="50" style="vertical-align: middle;">
+    </td>
+    <td>
+      <h1 style="display: inline-block; vertical-align: middle;">
+        <strong>Virtual Assistant</strong>
+      </h1>
+    </td>
+  </tr>
+</table>
+
+An AI-powered assistant with real-time support for <strong>text</strong>, <strong>voice commands</strong>, and <strong>image recognition</strong>, powered by
+<a href="https://ollama.com/library/llama3" target="_blank"><strong>LLaMA 3</strong></a> and
+<a href="https://ollama.com/library/llava" target="_blank"><strong>LLaVA</strong></a>.
+
+
 
 
 
@@ -108,4 +125,6 @@ npm start
 
 ## 📄 License
 This project is open-source and available under the MIT License.
+
+---
 
