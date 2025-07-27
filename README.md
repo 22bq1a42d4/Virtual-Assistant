@@ -1,19 +1,22 @@
-<table>
-  <tr>
-    <td width="60">
-      <img src="assets/robot_intro.jpg" alt="Project Icon" width="50" style="vertical-align: middle;">
-    </td>
-    <td>
-      <h1 style="display: inline-block; vertical-align: middle;">
-        <strong>Virtual Assistant</strong>
-      </h1>
-    </td>
-  </tr>
-</table>
+<p align="center">
+  <table>
+    <tr>
+      <td width="60" align="center">
+        <img src="assets/robot_intro.jpg" alt="AI Assistant Logo" width="50" />
+      </td>
+      <td align="center">
+        <h1><strong>Virtual Assistant</strong></h1>
+      </td>
+    </tr>
+  </table>
+</p>
 
-An AI-powered assistant with real-time support for <strong>text</strong>, <strong>voice commands</strong>, and <strong>image recognition</strong>, powered by
-<a href="https://ollama.com/library/llama3" target="_blank"><strong>LLaMA 3</strong></a> and
-<a href="https://ollama.com/library/llava" target="_blank"><strong>LLaVA</strong></a>.
+<p align="center">
+  An intelligent, locally hosted AI system designed for <strong>real-time conversations</strong>, <strong>voice-controlled interactions</strong>, and <strong>image-driven understanding</strong>.
+  <br><br>
+  Built with next-generation <em>multimodal large language models</em>, this assistant simulates human-like responses for seamless <strong>customer engagement</strong> and smart task automation.
+</p>
+
 
 
 
