@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Assistant - Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // IMPORTANT: REPLACE THESE PLACEHOLDER VALUES WITH YOUR ACTUAL FIREBASE PROJECT CONFIGURATION!
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdyoX0It3p92O_N5wVbHL35jRqajnb5Dk",
+            authDomain: "ai-assistant-e49ab.firebaseapp.com",
+            projectId: "ai-assistant-e49ab",
+            storageBucket: "ai-assistant-e49ab.firebasestorage.app",
+            messagingSenderId: "173847201187",
+            appId: "1:173847201187:web:0047b2c57e933b63dc8616",
+            measurementId: "G-G0H0F6KSPP"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Make Firebase objects and functions globally accessible for this page
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        window.firebaseOnAuthStateChanged = onAuthStateChanged;
+        window.firebaseCreateUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.firebaseSignInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.firebaseDoc = doc;
+        window.firebaseSetDoc = setDoc;
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <style>
+        /* CSS Variables - Professional Palette */
+        :root {
+            --bg-dark: #1A202C; /* Primary background - dark blue-grey */
+            --surface-dark: #2D3748; /* Card, form backgrounds - slightly lighter blue-grey */
+            --bot-bubble: #5B84B1; /* Bot message background - muted, professional blue */
+            --user-bubble: #007BFF; /* User message background - vibrant blue */
+            --text-light: #E2E8F0; /* Off-white text */
+            --text-muted: #A0AEC0; /* Muted grey text */
+            --accent-primary: #007BFF; /* General button/highlight blue */
+            --accent-primary-dark: #0056b3; /* Darker shade for gradients */
+            --success-color: #28A745; /* Save button green */
+            --success-color-dark: #1e7e34; /* Darker green */
+            --danger-color: #DC3545; /* Logout button red */
+            --danger-color-dark: #bd2130; /* Darker red */
+            --border-light: #4A5568; /* Light grey border */
+            --shadow-light: rgba(0, 0, 0, 0.4);
+            --shadow-dark: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Base Styles: Ensure full viewport coverage */
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-light);
+            overflow: hidden; /* Prevent body scrollbars */
+            position: relative;
+            
+            /* --- Background Image Styles --- */
+            background-image: url('background.webp'); /* Set your image path here */
+            background-size: cover; /* Cover the entire viewport */
+            background-position: center; /* Center the background image */
+            background-repeat: no-repeat; /* Do not repeat the image */
+            
+            /* Overlay for opacity and blur */
+            isolation: isolate; /* Create a new stacking context for pseudo-element */
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Black overlay with 50% opacity */
+            backdrop-filter: blur(0.5px); /* Apply a 5px blur filter */
+            z-index: -1; /* Place behind the content */
+        }
+        /* --- End Background Image Styles --- */
+
+
+        /* Main Container for Split Layout (Login Mode) */
+        .app-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            z-index: 1; /* Above background animation */
+        }
+
+        /* Login Screen Container (visible when not logged in) */
+        .login-screen {
+            display: flex; /* Shown by default, hidden when logged in */
+            width: 100%;
+            height: 100%;
+            background-color: transparent; /* Allows robot to show through */
+            position: absolute; /* Position over the main app-container */
+            top: 0;
+            left: 0;
+            z-index: 2; /* Above chat container if both somehow visible */
+        }
+
+        /* Left side for 3D Robot */
+        .robot-background-section {
+            flex-grow: 1; /* Takes up remaining space */
+            background-color: transparent; /* Ensure robot canvas is visible */
+            position: relative;
+        }
+
+        #robotCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* Background for this section */
+            display: block;
+            opacity: 1.0; /* Increased opacity for better visibility */
+            filter: none; /* Slightly less blur */
+            transition: opacity 1s ease-in-out;
+        }
+
+        /* Status message for 3D robot loading */
+        .robot-status {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--text-light);
+            font-size: 1.2em;
+            font-weight: bold;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+            z-index: 1; /* Above canvas, below auth panel */
+            text-align: center;
+        }
+
+        /* Right side for Login/Signup Form (the "popup") */
+        .auth-panel {
+            width: 450px; /* Fixed width for the popup effect */
+            background-color: transparent; /* Slightly more opaque for the form */
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5); /* Shadow to give popup effect */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border-left: 1px solid var(--border-light);
+            animation: slideInRight 0.5s ease-out forwards;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .auth-header {
+            padding: 18px;
+            background: transparent;
+            color: white;
+            text-align: center;
+            font-size: 1.6em;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            position: relative;
+            z-index: 2;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            width: 100%; /* Ensure header spans full width of panel */
+            border-radius: 15px 15px 0 0; /* Rounded top corners */
+        }
+
+        .auth-header i {
+            font-size: 1.3em;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .auth-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+            background-color: transparent; /* Darker background for content area */
+            width: 100%;
+            border-radius: 0 0 15px 15px; /* Rounded bottom corners */
+        }
+
+        .auth-form {
+            background-color: transparent;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgb(11, 11, 22);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-form h2 {
+            text-align: center;
+            color: var(--accent-primary);
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .auth-form input {
+            padding: 12px 18px;
+            border: 1px solid var(--border-light);
+            border-radius: 25px;
+            font-size: 1em;
+            outline: none;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-form input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.9;
+        }
+
+        .auth-form input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.4), 0 0 0 5px rgba(0, 123, 255, 0.4);
+        }
+
+        .auth-form button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-primary-dark));
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .auth-form button:hover {
+            background: linear-gradient(90deg, var(--accent-primary-dark), var(--accent-primary));
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 20px var(--shadow-dark);
+        }
+
+        .auth-form button:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        .auth-form .form-toggle {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .auth-form .form-toggle a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .auth-form .form-toggle a:hover {
+            color: var(--accent-primary-dark);
+            text-decoration: underline;
+        }
+
+        /* Responsive adjustments for main layout */
+        @media (max-width: 900px) {
+            .app-container {
+                flex-direction: column; /* Stack sections vertically on smaller screens */
+            }
+            .robot-background-section {
+                height: 50vh; /* Robot takes top half */
+                width: 100%;
+            }
+            .auth-panel {
+                width: 100%; /* Auth panel takes full width */
+                height: 50vh; /* Auth panel takes bottom half */
+                box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5); /* Shadow on top */
+                animation: slideInUp 0.5s ease-out forwards; /* Slide from bottom */
+            }
+            @keyframes slideInUp {
+                from { transform: translateY(100%); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+            .auth-header {
+                border-radius: 15px 15px 0 0; /* Adjust header border radius */
+            }
+            .auth-content {
+                border-radius: 0 0 15px 15px; /* Adjust content border radius */
+            }
+        }
+
+        @media (max-width: 600px) {
+            .auth-header {
+                font-size: 1.2em;
+                padding: 10px;
+            }
+            .auth-header i {
+                font-size: 0.9em;
+            }
+            .auth-form {
+                padding: 20px;
+                gap: 10px;
+            }
+            .auth-form input {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+            .auth-form button {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+        }
+        /* Floating animation for login panel */
+        @keyframes floatUpDown {
+            0%   { transform: translateY(0px); }
+            50%  { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .auth-panel {
+            animation: slideInRight 0.5s ease-out forwards, floatUpDown 5s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container" id="appContainer">
+        <div class="login-screen" id="loginScreen">
+            <div class="robot-background-section">
+                <canvas id="robotCanvas"></canvas>
+                <div id="robotStatus" class="robot-status">Loading 3D Robot...</div>
+            </div>
+            <div class="auth-panel">
+                <div class="auth-header"><i class="fas fa-user-circle"></i> AI Assistant Authentication</div>
+                <div class="auth-content">
+                    <form class="auth-form" id="loginForm">
+                        <h2>Login</h2>
+                        <input type="email" id="loginEmail" placeholder="Email" required autocomplete="email"/>
+                        <input type="password" id="loginPassword" placeholder="Password" required autocomplete="current-password"/>
+                        <button type="submit">Login</button>
+                        <div class="form-toggle">
+                            Don't have an account? <a href="#" id="showSignup">Sign Up</a>
+                        </div>
+                        <p id="loginError" style="color: var(--danger-color); text-align: center; margin-top: 10px;"></p>
+                    </form>
+
+                    <form class="auth-form" id="signupForm" style="display: none;">
+                        <h2>Sign Up</h2>
+                        <input type="email" id="signupEmail" placeholder="Email" required autocomplete="email"/>
+                        <input type="password" id="signupPassword" placeholder="Password" required autocomplete="new-password"/>
+                        <input type="password" id="signupConfirmPassword" placeholder="Confirm Password" required autocomplete="new-password"/>
+                        <button type="submit">Sign Up</button>
+                        <div class="form-toggle">
+                            Already have an account? <a href="#" id="showLogin">Login</a>
+                        </div>
+                        <p id="signupError" style="color: var(--danger-color); text-align: center; margin-top: 10px;"></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const auth = window.firebaseAuth;
+            const db = window.firebaseDb;
+            const onAuthStateChanged = window.firebaseOnAuthStateChanged;
+            const createUserWithEmailAndPassword = window.firebaseCreateUserWithEmailAndPassword;
+            const signInWithEmailAndPassword = window.firebaseSignInWithEmailAndPassword;
+            const doc = window.firebaseDoc;
+            const setDoc = window.firebaseSetDoc;
+
+            // Login/Signup DOM elements
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const showSignupLink = document.getElementById('showSignup');
+            const showLoginLink = document.getElementById('showLogin');
+            const loginEmailInput = document.getElementById('loginEmail');
+            const loginPasswordInput = document.getElementById('loginPassword');
+            const loginError = document.getElementById('loginError');
+            const signupEmailInput = document.getElementById('signupEmail');
+            const signupPasswordInput = document.getElementById('signupPassword');
+            const signupConfirmPasswordInput = document.getElementById('signupConfirmPassword');
+            const signupError = document.getElementById('signupError');
+
+            // --- Authentication Logic ---
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    // User is logged in, redirect to the main app
+                    window.location.href = 'index.html';
+                }
+                // If not logged in, stay on this page
+            });
+
+            // Auth Form Toggles
+            showSignupLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginForm.style.display = 'none';
+                signupForm.style.display = 'flex';
+                loginError.textContent = '';
+                signupError.textContent = '';
+            });
+
+            showLoginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                signupForm.style.display = 'none';
+                loginForm.style.display = 'flex';
+                loginError.textContent = '';
+                signupError.textContent = '';
+            });
+
+            // Login Functionality
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = loginEmailInput.value;
+                const password = loginPasswordInput.value;
+                loginError.textContent = '';
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    // onAuthStateChanged will handle UI switch
+                } catch (error) {
+                    loginError.textContent = `Login failed: ${error.message}`;
+                    console.error("Login Error:", error);
+                }
+            });
+
+            // Signup Functionality
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = signupEmailInput.value;
+                const password = signupPasswordInput.value;
+                const confirmPassword = signupConfirmPasswordInput.value;
+
+                if (password !== confirmPassword) {
+                    signupError.textContent = "Passwords do not match!";
+                    return;
+                }
+                if (password.length < 6) {
+                    signupError.textContent = "Password should be at least 6 characters!";
+                    return;
+                }
+
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    await setDoc(doc(db, "users", userCredential.user.uid), {
+                        email: email,
+                        name: "",
+                        phoneNumber: ""
+                    });
+                    // onAuthStateChanged will handle UI switch
+                } catch (error) {
+                    signupError.textContent = `Sign Up failed: ${error.message}`;
+                    console.error("Sign Up Error:", error);
+                }
+            });
+
+            // --- Three.js Robot Integration ---
+            const canvas = document.getElementById('robotCanvas');
+            const robotStatus = document.getElementById('robotStatus'); // Get the status element
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0); // Transparent background
+
+            // Increased Ambient Light Intensity
+            const ambientLight = new THREE.AmbientLight(0xffffff, 3); // Increased intensity to 3 (from 2) and color to white
+            scene.add(ambientLight);
+
+            // Increased Directional Light Intensity and adjusted position slightly for better highlights
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 2); // Increased intensity to 2 (from 1)
+            directionalLight.position.set(7, 12, 10); // Adjusted position for more direct lighting
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false;
+            controls.maxPolarAngle = Math.PI / 2;
+
+            const loader = new THREE.GLTFLoader();
+            let robotModel;
+
+            // IMPORTANT: Ensure this path is correct relative to where login.html is served
+            const glbPath = './019808ab-4e08-7793-90e2-8aeeb0fdefd3.glb'; 
+            console.log('Attempting to load 3D robot from:', glbPath); // Log the path
+
+            loader.load(
+                glbPath,
+                function (gltf) {
+                    robotModel = gltf.scene;
+                    scene.add(robotModel);
+
+                    // Adjust model position and scale for the left side of the screen
+                    robotModel.scale.set(3.5, 3.5, 3.5); // Slightly increased scale
+                    robotModel.position.set(-0.8 , 1.0, 0.0); // Adjusted position to be more centered/visible
+                    
+                    robotModel.traverse((node) => {
+                        if (node.isMesh) {
+                            node.castShadow = true;
+                            node.receiveShadow = true;
+                        }
+                    });
+
+                    camera.position.set(0, 0, 5); // Initial camera position
+                    robotStatus.style.display = 'none'; // Hide status message on success
+                    console.log('3D Robot model loaded successfully!');
+                },
+                undefined, // onProgress callback (optional)
+                function (error) {
+                    console.error('An error occurred loading the GLB model:', error);
+                    canvas.style.display = 'none'; // Hide canvas if model fails to load
+                    robotStatus.textContent = 'Failed to load 3D Robot. Check console for errors.';
+                    robotStatus.style.color = 'var(--danger-color)'; // Use a danger color for error
+                    robotStatus.style.display = 'block'; // Ensure error message is visible
+                }
+            );
+
+            // Animation variables
+            const clock = new THREE.Clock();
+            const animationSpeed = 5.0; // Controls overall animation speed
+            const floatAmplitude = 0.05; // How much the robot floats up/down
+            const floatFrequency = 2; // How fast the robot floats
+
+            function animate() {
+                requestAnimationFrame(animate);
+
+                const elapsedTime = clock.getElapsedTime();
+
+                if (robotModel) {
+                    // Original rotation (slow spin)
+                    robotModel.rotation.y += 0.008; 
+                    
+                    // Subtle floating animation
+                    robotModel.position.y = -0.5 + Math.sin(elapsedTime * floatFrequency) * floatAmplitude;
+
+                    // Subtle head tilt (assuming the model has a head or upper body that can be rotated)
+                    // This might require more specific knowledge of the GLB model's hierarchy.
+                    // For a generic model, applying a slight rotation to the whole model's X or Z axis can simulate it.
+                    robotModel.rotation.x = Math.sin(elapsedTime * (floatFrequency / 2)) * 0.02; // Slower, smaller tilt
+                    robotModel.rotation.z = Math.cos(elapsedTime * (floatFrequency / 3)) * 0.01; // Even slower, smaller side tilt
+                }
+
+                controls.update();
+                renderer.render(scene, camera);
+            }
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            animate(); // Start the 3D animation loop
+        });
+    </script>
+</body>
+</html>
