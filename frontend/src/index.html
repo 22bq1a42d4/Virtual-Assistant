@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Assistant - Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+
+        // IMPORTANT: REPLACE THESE PLACEHOLDER VALUES WITH YOUR ACTUAL FIREBASE PROJECT CONFIGURATION!
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdyoX0It3p92O_N5wVbHL35jRqajnb5Dk",
+            authDomain: "ai-assistant-e49ab.firebaseapp.com",
+            projectId: "ai-assistant-e49ab",
+            storageBucket: "ai-assistant-e49ab.firebasestorage.app",
+            messagingSenderId: "173847201187",
+            appId: "1:173847201187:web:0047b2c57e933b63dc8616",
+            measurementId: "G-G0H0F6KSPP"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const functions = getFunctions(app); // Initialize Cloud Functions
+
+        // Make Firebase objects and functions globally accessible for this page
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        window.firebaseSignOut = signOut;
+        window.firebaseOnAuthStateChanged = onAuthStateChanged;
+        window.firebaseGetDoc = getDoc;
+        window.firebaseSetDoc = setDoc;
+        window.firebaseDoc = doc;
+        window.firebaseFunctions = functions;
+        window.firebaseHttpsCallable = httpsCallable;
+    </script>
+
+    <style>
+        /* CSS Variables - Professional Palette */
+        :root {
+            --bg-dark: #1A202C; /* Primary background - dark blue-grey */
+            --surface-dark: #2D3748; /* Card, form backgrounds - slightly lighter blue-grey */
+            --bot-bubble: #5B84B1; /* Bot message background - muted, professional blue */
+            --user-bubble: #007BFF; /* User message background - vibrant blue */
+            --text-light: #E2E8F0; /* Off-white text */
+            --text-muted: #A0AEC0; /* Muted grey text */
+            --accent-primary: #007BFF; /* General button/highlight blue */
+            --accent-primary-dark: #0056b3; /* Darker shade for gradients */
+            --success-color: #28A745; /* Save button green */
+            --success-color-dark: #1e7e34; /* Darker green */
+            --danger-color: #DC3545; /* Logout button red */
+            --danger-color-dark: #bd2130; /* Darker red */
+            --border-light: #4A5568; /* Light grey border */
+            --shadow-light: rgba(0, 0, 0, 0.4);
+            --shadow-dark: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Base Styles: Ensure full viewport coverage */
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: var(--bg-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-light);
+            overflow: hidden; /* Prevent body scrollbars */
+            position: relative;
+            background-image: radial-gradient(circle at center, var(--bg-dark) 0%, #0c0c16 100%);
+            animation: backgroundPulse 15s infinite alternate ease-in-out;
+        }
+
+        @keyframes backgroundPulse {
+            0% { background-color: var(--bg-dark); background-position: 0% 0%; }
+            50% { background-color: #12121e; background-position: 100% 100%; }
+            100% { background-color: var(--bg-dark); background-position: 0% 0%; }
+        }
+
+        /* Main Container for Split Layout (Login Mode) */
+        .app-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            z-index: 1; /* Above background animation */
+        }
+
+        /* Chat Container (visible when logged in) */
+        .chat-container {
+            display: flex; /* Always flex, authentication handled by JS redirect */
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(8px);
+        }
+
+        /* Chat related styles (copied from previous index.html for completeness) */
+        .chat-header {
+            padding: 12px 20px;
+            background: linear-gradient(90deg, var(--accent-primary-dark), var(--accent-primary));
+            color: white;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 2;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-header i {
+            font-size: 1.2em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-header .profile-icon-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.6em;
+            cursor: pointer;
+            padding: 3px;
+            border-radius: 50%;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            margin-left: auto;
+            text-decoration: none;
+        }
+
+        .chat-header .profile-icon-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .chat-box {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            background-color: var(--bg-dark);
+            border-bottom: 1px solid var(--border-light);
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-primary) var(--surface-dark);
+        }
+
+        .chat-box::-webkit-scrollbar {
+            width: 10px;
+        }
+        .chat-box::-webkit-scrollbar-track {
+            background: var(--surface-dark);
+            border-radius: 10px;
+        }
+        .chat-box::-webkit-scrollbar-thumb {
+            background-color: var(--accent-primary);
+            border-radius: 10px;
+            border: 2px solid var(--surface-dark);
+        }
+
+        .message {
+            margin-bottom: 20px;
+            line-height: 1.7;
+            padding: 15px 22px;
+            border-radius: 20px;
+            max-width: 70%;
+            word-wrap: break-word;
+            animation: slideInFromSide 0.5s ease-out forwards;
+            position: relative;
+            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+        }
+
+        @keyframes slideInFromSide {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .message:hover {
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .message strong {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 1em;
+            color: var(--text-muted);
+        }
+
+        .user {
+            background-color: var(--user-bubble);
+            color: white;
+            margin-left: auto;
+            text-align: right;
+            border-bottom-right-radius: 8px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+        .user strong {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .bot {
+            background-color: var(--bot-bubble);
+            color: var(--text-light);
+            margin-right: auto;
+            text-align: left;
+            border-bottom-left-radius: 8px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+        .bot strong {
+            color: var(--accent-primary);
+        }
+        
+        .message img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            margin-top: 18px;
+            display: block;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .bot-typing {
+            font-style: italic;
+            color: var(--text-muted);
+            opacity: 0.8;
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: var(--bot-bubble);
+            border-radius: 20px;
+            max-width: fit-content; 
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            animation: pulseFade 1.5s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulseFade {
+            0% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); }
+            100% { opacity: 0.8; transform: scale(1); }
+        }
+
+        .bot-typing::after {
+            content: '';
+            display: inline-block;
+            width: 25px;
+            height: 1em;
+            vertical-align: middle;
+            overflow: hidden;
+            animation: typingDots 1.5s infinite steps(3);
+        }
+
+        @keyframes typingDots {
+            0% { content: '.'; }
+            33% { content: '..'; }
+            66% { content: '...'; }
+            100% { content: '.'; }
+        }
+
+        .speak-button {
+            background: none;
+            border: none;
+            font-size: 1em;
+            cursor: pointer;
+            color: var(--text-muted);
+            margin-left: 10px;
+            transition: color 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
+            padding: 6px;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .speak-button:hover {
+            color: var(--accent-primary);
+            transform: scale(1.3);
+            background-color: rgba(0, 123, 255, 0.15);
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        }
+
+        .chat-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 12px 20px;
+            border-top: 1px solid var(--border-light);
+            background-color: var(--surface-dark);
+            align-items: stretch;
+            position: relative;
+            z-index: 2;
+        }
+
+        .chat-form input[type="text"] {
+            width: 100%;
+            margin-bottom: 0;
+            padding: 8px 15px;
+            border: 1px solid var(--border-light);
+            border-radius: 18px;
+            font-size: 0.9em;
+            outline: none;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-form input[type="text"]::placeholder {
+            color: var(--text-muted);
+            opacity: 0.9;
+        }
+
+        .chat-form input[type="text"]:focus {
+            border-color: var(--accent-primary);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(0, 123, 255, 0.3);
+        }
+
+        .chat-action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: flex-end;
+            width: 100%;
+        }
+
+        .chat-form button {
+            flex: 0 0 auto;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 18px;
+            color: white;
+            font-weight: 500;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            min-width: unset;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-primary-dark));
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-form button:hover {
+            background: linear-gradient(90deg, var(--accent-primary-dark), var(--accent-primary));
+            transform: translateY(-1px) scale(1.01);
+            box-shadow: 0 4px 10px var(--shadow-dark);
+        }
+
+        .chat-form button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+        }
+
+        .chat-form button:disabled {
+            background: #4A5568;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.6;
+        }
+
+        .stop-btn {
+            background: linear-gradient(90deg, var(--danger-color), var(--danger-color-dark)) !important;
+        }
+
+        .stop-btn:hover {
+            background: linear-gradient(90deg, var(--danger-color-dark), var(--danger-color)) !important;
+        }
+
+        .image-preview-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.4s ease-out, border-bottom 0.4s ease-out;
+            border-bottom: 1px solid transparent;
+            background-color: var(--bot-bubble);
+            box-shadow: inset 0 -3px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-preview-container.active {
+            max-height: 80px;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        #selectedImagePreview {
+            max-width: 90%;
+            max-height: 60px;
+            border-radius: 8px;
+            object-fit: contain;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease-out;
+        }
+        #selectedImagePreview:hover {
+            transform: scale(1.01);
+        }
+
+        #imageInput {
+            display: none;
+        }
+        
+        #chooseImageBtn {
+            background: linear-gradient(90deg, #6C757D, #5A6268);
+        }
+
+        #chooseImageBtn:hover {
+            background: linear-gradient(90deg, #5A6268, #6C757D);
+        }
+
+        #sendBtn {
+            background: linear-gradient(90deg, var(--success-color), var(--success-color-dark));
+        }
+        #sendBtn:hover {
+            background: linear-gradient(90deg, var(--success-color-dark), var(--success-color));
+        }
+
+        .call-input-group {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 6px;
+            margin-top: 8px;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .call-input-group input[type="tel"] {
+            flex: 0 0 auto;
+            width: 160px;
+            padding: 8px 15px;
+            border: 1px solid var(--border-light);
+            border-radius: 18px;
+            font-size: 0.9em;
+            outline: none;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .call-input-group input[type="tel"]::placeholder {
+            color: var(--text-muted);
+            opacity: 0.9;
+        }
+
+        .call-input-group input[type="tel"]:focus {
+            border-color: var(--accent-primary);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(0, 123, 255, 0.3);
+        }
+
+        #callBotBtn {
+            background: linear-gradient(90deg, #17A2B8, #138496);
+        }
+
+        #callBotBtn:hover {
+            background: linear-gradient(90deg, #138496, #17A2B8);
+        }
+        
+        /* Profile Modal Styles */
+        .profile-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent backdrop */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Ensure it's on top */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .profile-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .profile-modal-content {
+            background-color: var(--surface-dark);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 90%;
+            max-width: 600px;
+            border: 1px solid var(--border-light);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            margin: 40px 20px;
+        }
+
+        .profile-modal-overlay.active .profile-modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .profile-modal-content h2 {
+            text-align: center;
+            color: var(--accent-primary);
+            margin-bottom: 25px;
+            font-size: 2em;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Display Mode Styles inside modal */
+        .profile-modal-display-mode {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .profile-modal-display-mode p {
+            font-size: 1.1em;
+            color: var(--text-light);
+            line-height: 1.6;
+            margin: 0;
+        }
+        .profile-modal-display-mode p strong {
+            display: block;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+        .profile-modal-display-mode p span {
+            display: block;
+            font-weight: 500;
+            color: var(--accent-primary);
+            font-size: 1.1em;
+        }
+
+        /* Edit Mode Styles inside modal */
+        .profile-modal-edit-mode {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .profile-modal-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .profile-modal-form-group label {
+            font-size: 1em;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .profile-modal-content input {
+            padding: 14px 20px;
+            border: 1px solid var(--border-light);
+            border-radius: 30px;
+            font-size: 1.1em;
+            outline: none;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-modal-content input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.9;
+        }
+
+        .profile-modal-content input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.4), 0 0 0 6px rgba(0, 123, 255, 0.4);
+        }
+
+        .profile-modal-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .profile-modal-content button {
+            flex: 1 1 auto;
+            max-width: 200px;
+            padding: 14px 25px;
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-weight: 600;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            background: linear-gradient(90deg, var(--success-color), var(--success-color-dark));
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .profile-modal-content button i {
+            font-size: 1em;
+        }
+
+        .profile-modal-content button:hover {
+            background: linear-gradient(90deg, var(--success-color-dark), var(--success-color));
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 25px var(--shadow-dark);
+        }
+
+        .profile-modal-content button:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.6);
+        }
+
+        .profile-modal-content .edit-btn {
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-primary-dark)) !important;
+        }
+        .profile-modal-content .edit-btn:hover {
+            background: linear-gradient(90deg, var(--accent-primary-dark), var(--accent-primary)) !important;
+        }
+        .profile-modal-content .cancel-btn {
+            background: linear-gradient(90deg, #6C757D, #5A6268) !important;
+        }
+        .profile-modal-content .cancel-btn:hover {
+            background: linear-gradient(90deg, #5A6268, #6C757D) !important;
+        }
+        .profile-modal-content .logout-btn {
+            background: linear-gradient(90deg, var(--danger-color), var(--danger-color-dark)) !important;
+        }
+        .profile-modal-content .logout-btn:hover {
+            background: linear-gradient(90deg, var(--danger-color-dark), var(--danger-color)) !important;
+        }
+
+        .profile-modal-content .status-message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        /* Back button inside modal */
+        .profile-modal-content .back-to-chat-modal-btn {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.8em;
+            cursor: pointer;
+            transition: color 0.3s ease, transform 0.3s ease;
+            padding: 5px;
+            border-radius: 50%;
+        }
+
+        .profile-modal-content .back-to-chat-modal-btn:hover {
+            color: var(--accent-primary);
+            transform: scale(1.1);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive adjustments for main layout */
+        @media (max-width: 900px) {
+            .app-container {
+                flex-direction: column; /* Stack sections vertically on smaller screens */
+            }
+            .robot-background-section {
+                height: 50vh; /* Robot takes top half */
+                width: 100%;
+            }
+            .auth-panel {
+                width: 100%; /* Auth panel takes full width */
+                height: 50vh; /* Auth panel takes bottom half */
+                box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5); /* Shadow on top */
+                animation: slideInUp 0.5s ease-out forwards; /* Slide from bottom */
+            }
+            @keyframes slideInUp {
+                from { transform: translateY(100%); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+            .auth-header {
+                border-radius: 15px 15px 0 0; /* Adjust header border radius */
+            }
+            .auth-content {
+                border-radius: 0 0 15px 15px; /* Adjust content border radius */
+            }
+        }
+
+        @media (max-width: 600px) {
+            .auth-header {
+                font-size: 1.2em;
+                padding: 10px;
+            }
+            .auth-header i {
+                font-size: 0.9em;
+            }
+            .auth-form {
+                padding: 20px;
+                gap: 10px;
+            }
+            .auth-form input {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+            .auth-form button {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container" id="appContainer">
+        <!-- Main Chat Application -->
+        <div class="chat-container" id="chatContainer">
+            <div class="chat-header">
+                <i class="fas fa-robot"></i> AI Assistant 
+                <button type="button" id="goToProfileBtn" class="profile-icon-btn" title="Manage Profile"><i class="fas fa-user-circle"></i></button>
+            </div>
+            <div class="chat-box" id="chat"></div>
+
+            <!-- Image Preview Container -->
+            <div class="image-preview-container" id="imagePreviewContainer">
+                <img id="selectedImagePreview" src="" alt="Selected Image" style="display: none;">
+            </div>
+
+            <form class="chat-form" id="chatForm">
+                <input type="text" id="messageInput" placeholder="Type your message here..." autocomplete="off" />
+                <div class="chat-action-buttons">
+                    <input type="file" id="imageInput" accept="image/*" />
+                    <button type="button" id="chooseImageBtn" title="Attach Image"><i class="fas fa-image"></i> Image</button>
+                    <button type="button" id="micBtn" title="Voice Input"><i class="fas fa-microphone"></i> Voice</button>
+                    <button type="submit" id="sendBtn" title="Send Message" disabled><i class="fas fa-paper-plane"></i> Send</button>
+                    <button type="button" id="stopBtn" class="stop-btn" title="Stop Generation" style="display: none;"><i class="fas fa-stop-circle"></i> Stop</button>
+                </div>
+                <!-- New Call Bot section -->
+                <div class="call-input-group">
+                    <input type="tel" id="phoneNumberInput" placeholder="Enter phone number (e.g., +1234567890)" />
+                    <button type="button" id="callBotBtn" title="Call the AI Assistant" disabled><i class="fas fa-phone"></i> Call Bot</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Profile Modal Overlay (Hidden by default) -->
+    <div id="profileModalOverlay" class="profile-modal-overlay">
+        <div class="profile-modal-content">
+            <button type="button" id="backToChatModalBtn" class="back-to-chat-modal-btn" title="Back to Chat"><i class="fas fa-arrow-left"></i></button>
+            <h2>User Profile</h2>
+            
+            <!-- Display Mode -->
+            <div id="profileDisplayMode" class="profile-modal-display-mode">
+                <p><strong>Email:</strong> <span id="profileEmailDisplay"></span></p>
+                <p><strong>Name:</strong> <span id="profileNameDisplay">Not set</span></p>
+                <p><strong>Phone:</strong> <span id="profilePhoneDisplay">Not set</span></p>
+                <div class="profile-modal-buttons">
+                    <button type="button" id="editProfileBtn" class="edit-btn"><i class="fas fa-edit"></i> Edit Profile</button>
+                    <button type="button" id="logoutBtnDisplay" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
+            </div>
+
+            <!-- Edit Mode -->
+            <form id="profileEditMode" class="profile-modal-edit-mode">
+                <div class="profile-modal-form-group">
+                    <label for="profileName">Name:</label>
+                    <input type="text" id="profileName" placeholder="Your Name" autocomplete="name"/>
+                </div>
+                <div class="profile-modal-form-group">
+                    <label for="profilePhone">Phone Number:</label>
+                    <input type="tel" id="profilePhone" placeholder="e.g., +1234567890" autocomplete="tel"/>
+                </div>
+                <div class="profile-modal-buttons">
+                    <button type="submit" id="saveProfileBtn"><i class="fas fa-save"></i> Save Changes</button>
+                    <button type="button" id="cancelEditBtn" class="cancel-btn"><i class="fas fa-times-circle"></i> Cancel</button>
+                    <button type="button" id="logoutBtnEdit" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
+                <p id="profileMessage" class="status-message" style="color: var(--danger-color);"></p>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const auth = window.firebaseAuth;
+            const db = window.firebaseDb;
+            const signOut = window.firebaseSignOut;
+            const onAuthStateChanged = window.firebaseOnAuthStateChanged;
+            const getDoc = window.firebaseGetDoc;
+            const setDoc = window.firebaseSetDoc;
+            const doc = window.firebaseDoc;
+            const functions = window.firebaseFunctions;
+            const httpsCallable = window.firebaseHttpsCallable;
+
+            let currentUserId = null;
+            let recognition;
+            let recognizing = false;
+            let resultReceived = false;
+            let typingIndicator = null;
+            let chatStreamReader = null;
+
+            // Chat DOM elements
+            const chatBox = document.getElementById('chat');
+            const messageInput = document.getElementById('messageInput');
+            const chatForm = document.getElementById('chatForm');
+            const imageInput = document.getElementById('imageInput');
+            const chooseImageBtn = document.getElementById('chooseImageBtn');
+            const selectedImagePreview = document.getElementById('selectedImagePreview');
+            const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+            const sendBtn = document.getElementById('sendBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const phoneNumberInput = document.getElementById('phoneNumberInput');
+            const callBotBtn = document.getElementById('callBotBtn');
+            const goToProfileBtn = document.getElementById('goToProfileBtn');
+            const micBtn = document.getElementById('micBtn');
+
+            // Profile Modal DOM elements
+            const profileModalOverlay = document.getElementById('profileModalOverlay');
+            const profileDisplayMode = document.getElementById('profileDisplayMode');
+            const profileEditMode = document.getElementById('profileEditMode');
+            const profileEmailDisplay = document.getElementById('profileEmailDisplay');
+            const profileNameDisplay = document.getElementById('profileNameDisplay');
+            const profilePhoneDisplay = document.getElementById('profilePhoneDisplay');
+            const profileNameInput = document.getElementById('profileName');
+            const profilePhoneInput = document.getElementById('profilePhone');
+            const editProfileBtn = document.getElementById('editProfileBtn');
+            const saveProfileBtn = document.getElementById('saveProfileBtn');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+            const logoutBtnDisplay = document.getElementById('logoutBtnDisplay');
+            const logoutBtnEdit = document.getElementById('logoutBtnEdit');
+            const profileMessage = document.getElementById('profileMessage');
+            const backToChatModalBtn = document.getElementById('backToChatModalBtn');
+
+            // --- Authentication Check and Redirect ---
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    currentUserId = user.uid;
+                    await loadPhoneNumberForCall(user.uid); // Load phone number for chat page
+                    resetChatUI(false); // Enable chat controls
+                } else {
+                    // If not logged in, redirect to login page
+                    window.location.href = 'login.html';
+                }
+            });
+
+            async function loadPhoneNumberForCall(uid) {
+                try {
+                    const userDoc = await getDoc(doc(db, "users", uid));
+                    if (userDoc.exists() && userDoc.data().phoneNumber) {
+                        phoneNumberInput.value = userDoc.data().phoneNumber;
+                        callBotBtn.disabled = false;
+                    } else {
+                        phoneNumberInput.value = '';
+                        callBotBtn.disabled = true;
+                    }
+                } catch (error) {
+                    console.error("Error loading user phone number:", error);
+                    phoneNumberInput.value = '';
+                    callBotBtn.disabled = true;
+                }
+            }
+
+            // --- Chat Functionality ---
+            function appendMessage(sender, text, imageUrl = null) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', sender === 'user' ? 'user' : 'bot');
+                let content = `<strong>${sender === 'user' ? 'You' : 'AI Assistant'}</strong><p>${text}</p>`;
+                if (imageUrl) {
+                    content += `<img src="${imageUrl}" alt="Attached Image">`;
+                }
+                messageElement.innerHTML = content;
+                chatBox.appendChild(messageElement);
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                if (sender === 'bot') {
+                    const speakBtn = document.createElement('button');
+                    speakBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                    speakBtn.classList.add('speak-button');
+                    speakBtn.title = 'Click to read aloud';
+                    speakBtn.onclick = () => {
+                        const utterance = new SpeechSynthesisUtterance(text);
+                        utterance.lang = 'en-IN';
+                        speechSynthesis.speak(utterance);
+                    };
+                    messageElement.appendChild(speakBtn);
+                }
+            }
+
+            function showTypingIndicator() {
+                if (!typingIndicator) {
+                    typingIndicator = document.createElement('div');
+                    typingIndicator.classList.add('bot-typing');
+                    typingIndicator.textContent = 'AI Assistant is typing';
+                    chatBox.appendChild(typingIndicator);
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+            }
+
+            function hideTypingIndicator() {
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                    typingIndicator = null;
+                }
+            }
+
+            // Helper to convert file to Base64
+            function convertFileToBase64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result.split(',')[1]); // Get base64 part
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            async function streamGeminiResponse(userMessage, imageBase64 = null) {
+                showTypingIndicator();
+                resetChatUI(true); // Disable all controls
+                stopBtn.style.display = 'inline-flex'; // Show stop button
+
+                // Use fetch to call your Node.js Express backend for Gemini queries
+                try {
+                    const formData = new FormData();
+                    formData.append('question', userMessage);
+                    if (imageBase64) {
+                        // Convert base64 back to Blob/File for FormData if needed,
+                        // or modify your backend to accept base64 directly in JSON for /api/query
+                        // For simplicity, assuming backend expects base64 in JSON for /api/query
+                        // OR if backend expects multipart, you'd need to convert back to Blob.
+                        // For now, let's assume the backend /api/query handles JSON with base64.
+                        // If it uses multer.single('image'), it expects a file upload.
+                        // So, we'll need to adapt this.
+                        // Given your server.js uses `upload.single('image')`, it expects a file.
+                        // We need to send it as a Blob.
+                        const byteCharacters = atob(imageBase64);
+                        const byteNumbers = new Array(byteCharacters.length);
+                        for (let i = 0; i < byteCharacters.length; i++) {
+                            byteNumbers[i] = byteCharacters.charCodeAt(i);
+                        }
+                        const byteArray = new Uint8Array(byteNumbers);
+                        const blob = new Blob([byteArray], { type: 'image/png' }); // Adjust mimeType if needed
+                        formData.append('image', blob, 'image.png');
+                    }
+
+                    const currentUser = auth.currentUser;
+                    let idToken = null;
+                    if (currentUser) {
+                        idToken = await currentUser.getIdToken();
+                    }
+
+                    const response = await fetch('http://localhost:3000/api/query', {
+                        method: 'POST',
+                        headers: {
+                            // 'Content-Type': 'application/json', // Not needed for FormData
+                            ...(idToken && { 'Authorization': `Bearer ${idToken}` }) 
+                        },
+                        body: formData // Send as FormData
+                    });
+
+                    const data = await response.json();
+                    
+                    hideTypingIndicator();
+                    if (response.ok) {
+                        appendMessage('bot', data.answer);
+                    } else {
+                        console.error("Error from backend Gemini API:", data.error);
+                        appendMessage('bot', `Oops! Something went wrong: ${data.error}. Please try again.`);
+                    }
+                } catch (error) {
+                    console.error("Error calling backend Gemini API:", error);
+                    hideTypingIndicator();
+                    appendMessage('bot', 'Oops! Something went wrong with the AI connection. Please try again.');
+                } finally {
+                    resetChatUI(false); // Re-enable controls
+                    stopBtn.style.display = 'none'; // Hide stop button
+                }
+            }
+
+            chatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const userMessage = messageInput.value.trim();
+                const selectedImageFile = imageInput.files[0];
+
+                if (!userMessage && !selectedImageFile) return;
+
+                let imageUrlForDisplay = null;
+                let imageBase64 = null;
+
+                if (selectedImageFile) {
+                    imageUrlForDisplay = URL.createObjectURL(selectedImageFile);
+                    imageBase64 = await convertFileToBase64(selectedImageFile);
+                }
+
+                appendMessage('user', userMessage, imageUrlForDisplay);
+                messageInput.value = '';
+                clearImagePreview();
+
+                streamGeminiResponse(userMessage, imageBase64);
+            });
+
+            // Image Input Handling
+            chooseImageBtn.addEventListener('click', () => {
+                imageInput.click();
+            });
+
+            imageInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        selectedImagePreview.src = e.target.result;
+                        selectedImagePreview.style.display = 'block';
+                        imagePreviewContainer.classList.add('active');
+                        sendBtn.disabled = false;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    clearImagePreview();
+                }
+            });
+
+            function clearImagePreview() {
+                selectedImagePreview.src = '';
+                selectedImagePreview.style.display = 'none';
+                imagePreviewContainer.classList.remove('active');
+                sendBtn.disabled = messageInput.value.trim() === '' && imageInput.files.length === 0;
+            }
+
+            // Enable/Disable send button based on text input or image selection
+            messageInput.addEventListener('input', () => {
+                sendBtn.disabled = messageInput.value.trim() === '' && imageInput.files.length === 0;
+            });
+
+            // Enable/Disable call button based on phone number input
+            phoneNumberInput.addEventListener('input', () => {
+                callBotBtn.disabled = phoneNumberInput.value.trim() === '';
+            });
+
+            stopBtn.addEventListener('click', () => {
+                if (chatStreamReader) {
+                    chatStreamReader = null;
+                }
+                hideTypingIndicator();
+                resetChatUI(false);
+                stopBtn.style.display = 'none';
+            });
+
+            // Speech Recognition Setup
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.lang = 'en-IN';
+                recognition.interimResults = false;
+
+                recognition.onstart = () => {
+                    recognizing = true;
+                    resultReceived = false;
+                    micBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                    micBtn.classList.add('stop-btn');
+                    resetChatUI(true);
+                };
+
+                recognition.onend = () => {
+                    recognizing = false;
+                    micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                    micBtn.classList.remove('stop-btn');
+                    if (!resultReceived) {
+                        resetChatUI(false);
+                    }
+                };
+
+                recognition.onresult = (event) => {
+                    resultReceived = true;
+                    const transcript = event.results[0][0].transcript;
+                    messageInput.value = transcript;
+                    chatForm.requestSubmit();
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    if (!resultReceived) {
+                        appendMessage('bot', 'Voice input failed. Please try again or type your message.');
+                    }
+                    resetChatUI(false);
+                };
+
+                micBtn.onclick = () => {
+                    if (recognizing) {
+                        recognition.stop();
+                    } else {
+                        recognition.start();
+                    }
+                };
+            } else {
+                micBtn.disabled = true;
+                micBtn.title = "Speech recognition not supported in your browser.";
+                micBtn.style.opacity = 0.5;
+            }
+
+            // Call Bot Functionality
+            callBotBtn.addEventListener('click', async () => {
+                const phoneNumber = phoneNumberInput.value.trim();
+                const currentUser = auth.currentUser;
+
+                if (!phoneNumber && !currentUser) {
+                    appendMessage('bot', 'Please enter a phone number or log in to use your saved number.');
+                    return;
+                }
+
+                if (phoneNumber && !phoneNumber.match(/^\+\d{10,15}$/)) { 
+                    appendMessage('bot', 'Please enter a valid phone number including country code (e.g., +1234567890).');
+                    return;
+                }
+
+                appendMessage('user', `Initiating call to ${phoneNumber || 'saved number'}...`);
+                phoneNumberInput.value = ''; // Clear input after initiating
+
+                resetChatUI(true); // Disable controls during call initiation
+
+                let idToken = null;
+                if (currentUser) {
+                    idToken = await currentUser.getIdToken();
+                }
+
+                try {
+                    // --- Calling your Node.js Express backend for simulation ---
+                    const response = await fetch('http://localhost:3000/api/call', { // <--- IMPORTANT: Update this URL if your server runs on a different port or domain
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // Include the ID token if the user is authenticated
+                            ...(idToken && { 'Authorization': `Bearer ${idToken}` }) 
+                        },
+                        body: JSON.stringify({ phoneNumber: phoneNumber })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        appendMessage('bot', data.message);
+                    } else {
+                        console.error('Server error:', data.error);
+                        appendMessage('bot', `Failed to initiate call: ${data.error || 'Unknown error.'}`);
+                    }
+                    // --- End MODIFIED SECTION ---
+
+                    resetChatUI(false); // Re-enable controls after response
+                } catch (err) {
+                    console.error('Network or frontend error during call initiation:', err);
+                    appendMessage('bot', `Failed to initiate call: ${err.message}. Please check your network connection or server status.`);
+                    resetChatUI(false);
+                }
+            });
+
+            function resetChatUI(disable = false) {
+                messageInput.disabled = disable;
+                sendBtn.disabled = disable;
+                micBtn.disabled = disable;
+                chooseImageBtn.disabled = disable;
+                phoneNumberInput.disabled = disable;
+                callBotBtn.disabled = disable;
+
+                if (!disable) {
+                    sendBtn.disabled = messageInput.value.trim() === '' && imageInput.files.length === 0;
+                    callBotBtn.disabled = phoneNumberInput.value.trim() === '';
+                    micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                    micBtn.classList.remove('stop-btn');
+                }
+            }
+
+            // --- Profile Modal Logic ---
+            function showProfileDisplayMode() {
+                profileDisplayMode.style.display = 'flex';
+                profileEditMode.style.display = 'none';
+                profileMessage.textContent = '';
+            }
+
+            function showProfileEditMode() {
+                profileDisplayMode.style.display = 'none';
+                profileEditMode.style.display = 'flex';
+                profileMessage.textContent = '';
+            }
+
+            goToProfileBtn.addEventListener('click', () => {
+                profileModalOverlay.classList.add('active');
+                loadUserProfileData(currentUserId);
+                showProfileDisplayMode();
+            });
+
+            backToChatModalBtn.addEventListener('click', () => {
+                profileModalOverlay.classList.remove('active');
+            });
+
+            cancelEditBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                showProfileDisplayMode();
+                if (currentUserId) {
+                    loadUserProfileData(currentUserId);
+                }
+            });
+
+            const handleLogout = async () => {
+                try {
+                    await signOut(auth);
+                } catch (error) {
+                    console.error("Logout Error:", error);
+                    profileMessage.textContent = `Logout failed: ${error.message}`;
+                    profileMessage.style.color = 'var(--danger-color)';
+                }
+            };
+            logoutBtnDisplay.addEventListener('click', handleLogout);
+            logoutBtnEdit.addEventListener('click', handleLogout);
+
+            async function loadUserProfileData(uid) {
+                profileMessage.textContent = '';
+                if (!uid) {
+                    profileEmailDisplay.textContent = 'N/A';
+                    profileNameDisplay.textContent = 'Not set';
+                    profilePhoneDisplay.textContent = 'Not set';
+                    profileNameInput.value = '';
+                    profilePhoneInput.value = '';
+                    return;
+                }
+                
+                profileEmailDisplay.textContent = auth.currentUser.email || 'N/A';
+
+                try {
+                    const userDoc = await getDoc(doc(db, "users", uid));
+                    if (userDoc.exists()) {
+                        const data = userDoc.data();
+                        profileNameDisplay.textContent = data.name || 'Not set';
+                        profilePhoneDisplay.textContent = data.phoneNumber || 'Not set';
+                        profileNameInput.value = data.name || '';
+                        profilePhoneInput.value = data.phoneNumber || '';
+                    } else {
+                        profileNameDisplay.textContent = 'Not set';
+                        profilePhoneDisplay.textContent = 'Not set';
+                        profileNameInput.value = '';
+                        profilePhoneInput.value = '';
+                    }
+                } catch (error) {
+                    console.error("Error loading profile data:", error);
+                    profileMessage.textContent = "Failed to load profile data.";
+                    profileMessage.style.color = 'var(--danger-color)';
+                }
+            }
+
+            editProfileBtn.addEventListener('click', () => {
+                showProfileEditMode();
+            });
+
+            profileEditMode.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                profileMessage.textContent = '';
+                if (!currentUserId) {
+                    profileMessage.textContent = "No user logged in.";
+                    profileMessage.style.color = 'var(--danger-color)';
+                    return;
+                }
+                const name = profileNameInput.value;
+                const phoneNumber = profilePhoneInput.value;
+
+                try {
+                    await setDoc(doc(db, "users", currentUserId), {
+                        name: name,
+                        phoneNumber: phoneNumber
+                    }, { merge: true });
+                    profileMessage.textContent = 'Profile updated successfully!';
+                    profileMessage.style.color = 'var(--success-color)';
+                    await loadUserProfileData(currentUserId);
+                    showProfileDisplayMode();
+                    phoneNumberInput.value = phoneNumber;
+                    callBotBtn.disabled = phoneNumber.trim() === '';
+                } catch (error) {
+                    profileMessage.textContent = `Error updating profile: ${error.message}`;
+                    profileMessage.style.color = 'var(--danger-color)';
+                    console.error("Error updating profile:", error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
