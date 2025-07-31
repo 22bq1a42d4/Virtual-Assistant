@@ -386,29 +386,36 @@
        color: #1a202c;
      }
 
-    .flip-card-back {
-      background: var(--primary-gradient);
-      color: white;
-      transform: rotateY(180deg);
-      position: relative;
-      overflow: hidden;
-    }
+         .flip-card-back {
+       background: var(--primary-gradient);
+       color: white;
+       transform: rotateY(180deg);
+       position: relative;
+       overflow: hidden;
+       z-index: 1;
+     }
 
-    .flip-card-back::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: var(--secondary-gradient);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
+     .flip-card-back::before {
+       content: '';
+       position: absolute;
+       top: 0;
+       left: 0;
+       right: 0;
+       bottom: 0;
+       background: var(--secondary-gradient);
+       opacity: 0;
+       transition: opacity 0.3s ease;
+       z-index: -1;
+     }
 
-    .flip-card:hover .flip-card-back::before {
-      opacity: 1;
-    }
+     .flip-card-back > div {
+       position: relative;
+       z-index: 2;
+     }
+
+     .flip-card:hover .flip-card-back::before {
+       opacity: 0.3;
+     }
 
     /* Enhanced Sections */
     .section-light {
