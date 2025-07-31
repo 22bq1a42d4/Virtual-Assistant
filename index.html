@@ -1766,6 +1766,8 @@
             const handleLogout = async () => {
                 try {
                     await signOut(auth);
+                    // Redirect to landing page after successful logout
+                    window.location.href = 'landing.html';
                 } catch (error) {
                     console.error("Logout Error:", error);
                     profileMessage.textContent = `Logout failed: ${error.message}`;
