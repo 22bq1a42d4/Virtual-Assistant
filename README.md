@@ -1,133 +1,358 @@
-<p align="center">
-  <table>
-    <tr>
-      <td width="60" align="center">
-        <img src="assets/robot_intro.jpg" alt="AI Assistant Logo" width="50" />
-      </td>
-      <td align="center">
-        <h1><strong>Virtual Assistant</strong></h1>
-      </td>
-    </tr>
-  </table>
-</p>
+# React URL Shortener
 
-<p align="center">
-  An intelligent, locally hosted AI system designed for <strong>real-time conversations</strong>, <strong>voice-controlled interactions</strong>, and <strong>image-driven understanding</strong>.
-  <br><br>
-  Built with next-generation <em>multimodal large language models</em>, this assistant simulates human-like responses for seamless <strong>customer engagement</strong> and smart task automation.
-</p>
+A modern, client-side URL shortener built with React and Material UI. Transform long URLs into short, shareable links with custom shortcodes, analytics tracking, and expiry dates.
 
+![URL Shortener](https://img.shields.io/badge/React-18.2.0-blue.svg)
+![Material UI](https://img.shields.io/badge/Material--UI-5.11.10-blue.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
 
+## 🌟 Features
 
+### Core Functionality
+- **URL Shortening**: Convert long URLs into short, manageable links
+- **Custom Shortcodes**: Create memorable, branded short URLs with your own shortcodes
+- **Batch Processing**: Shorten up to 5 URLs simultaneously
+- **Expiry Dates**: Set validity periods for URLs (1 hour to 1 year)
+- **Client-Side Only**: No external servers required - everything runs in your browser
 
+### Analytics & Management
+- **Click Tracking**: Monitor how many times your short URLs are accessed
+- **Detailed Statistics**: Comprehensive analytics dashboard with filtering and sorting
+- **URL Management**: View, search, filter, and delete your shortened URLs
+- **Data Export**: Export your data as JSON for backup purposes
+- **Expired URL Cleanup**: Automatically manage expired URLs
 
+### User Experience
+- **Material UI Design**: Clean, modern interface with responsive design
+- **Real-time Validation**: Instant feedback on URL and shortcode validity
+- **Copy to Clipboard**: One-click copying of shortened URLs
+- **Loading States**: Smooth animations and loading indicators
+- **Error Handling**: Robust error handling with user-friendly messages
 
----
+### Technical Features
+- **Concurrent Processing**: Efficient handling of multiple URL shortening requests
+- **Local Storage**: All data stored securely in your browser
+- **Logging Middleware**: Comprehensive logging for debugging and analytics
+- **Progressive Web App**: Installable as a standalone application
+- **Accessibility**: Built with accessibility best practices
 
-## 🚀 Features
-
-- 🧠 AI Chatbot powered by LLaMA3 & LLaVA (via Ollama)
-- 🎤 Voice command recognition
-- 🖼️ Image input and visual response generation
-- 📞 Simulated AI phone call handling (Customer Care Agent)
-- 🔐 Firebase Authentication (Login/Signup)
-- 🧍 Real-time 3D Robot Model interaction
-- 🌐 Works offline on local machine
-
----
-
-## 🧱 Project Structure
-```bash
-virtual-assistant/
-│
-├── frontend/
-│ ├── src/
-│ ├── 019808ab-4e08-7793-90e2-8aeeb0fdefd3.glb # 3D Robot Model
-│ ├── App.css
-│ ├── App.js
-│ ├── App.test.js
-│ ├── background.webp
-│ ├── index.css
-│ ├── index.html
-│ ├── index.js
-│ ├── login.html
-│ ├── logo.svg
-│ ├── profile.html
-│ ├── reportWebVitals.js
-│ └── setupTests.js
-│
-├── backend/
-│ ├── controllers/
-│ ├── routes/
-│ ├── server.js
-│ ├── serviceAccountKey.json.json
-│ ├── package.json
-│ └── package-lock.json
-```
-
-
----
-
-## 💡 Technologies Used
-
-### 🎨 Frontend Stack
-<table> <tr> <td align="center"> <a href="https://developer.mozilla.org/en-US/docs/Web/HTML" target="_blank"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" width="50" height="50" alt="HTML5"/> <br><sub><b>HTML5</b></sub> </a> </td> <td align="center"> <a href="https://developer.mozilla.org/en-US/docs/Web/CSS" target="_blank"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" width="50" height="50" alt="CSS3"/> <br><sub><b>CSS3</b></sub> </a> </td> <td align="center"> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" width="50" height="50" alt="JavaScript"/> <br><sub><b>JavaScript</b></sub> </a> </td> <td align="center"> <a href="https://reactjs.org/" target="_blank"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="50" height="50" alt="React"/> <br><sub><b>React</b></sub> </a> </td> <td align="center"> <a href="https://threejs.org/" target="_blank"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/threejs/threejs-original.svg" width="50" height="50" alt="Three.js"/> <br><sub><b>Three.js</b></sub> </a> </td> <td align="center"> <a href="https://firebase.google.com/products/auth" target="_blank"> <img src="https://www.vectorlogo.zone/logos/firebase/firebase-icon.svg" width="50" height="50" alt="Firebase Auth"/> <br><sub><b>Firebase Auth</b></sub> </a> </td> <td align="center"> <a href="https://firebase.google.com/products/firestore" target="_blank"> <img src="https://www.vectorlogo.zone/logos/firebase/firebase-icon.svg" width="50" height="50" alt="Firestore"/> <br><sub><b>Firestore</b></sub> </a> </td> </tr> </table>
-
-### 🧠 Backend Stack
-<table> <tr> <td align="center"> <a href="https://nodejs.org/" target="_blank"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" width="50" height="50" alt="Node.js"/> <br><sub><b>Node.js</b></sub> </a> </td> <td align="center"> <a href="https://expressjs.com/" target="_blank"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" width="50" height="50" alt="Express.js"/> <br><sub><b>Express.js</b></sub> </a> </td> <td align="center"> <a href="https://firebase.google.com/docs/admin/setup" target="_blank"> <img src="https://www.vectorlogo.zone/logos/firebase/firebase-icon.svg" width="50" height="50" alt="Firebase Admin"/> <br><sub><b>Firebase Admin</b></sub> </a> </td> <td align="center"> <a href="https://ollama.com/library/llama3" target="_blank"> <img src="https://avatars.githubusercontent.com/u/169671556?s=200&v=4" width="50" height="50" alt="LLaMA 3"/> <br><sub><b>LLaMA 3</b></sub> </a> </td> <td align="center"> <a href="https://ollama.com/library/llava" target="_blank"> <img src="https://avatars.githubusercontent.com/u/169671556?s=200&v=4" width="50" height="50" alt="LLaVA"/> <br><sub><b>LLaVA</b></sub> </a> </td> </tr> </table>
-
----
-
-## 📷 Sample Login Page
-
-This project features a stylish login interface using Firebase Auth:
-- 3D Robot Model (GLB)
-- Split layout with secure sign-in
-- Real-time auth state detection
-
-![Login Page]
-
-
-
-<img width="947" height="508" alt="vi" src="https://github.com/user-attachments/assets/a6426db7-2f5e-49d1-ada8-c40359e6bc3e" />
-
----
-
-## 📦 Setup Instructions
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js ≥ 18
-- Ollama (LLaMA 3 & LLaVA models pulled)
-- Firebase project set up
-- GLB-supported 3D rendering enabled in browser
+- Node.js (version 14 or higher)
+- npm or yarn package manager
 
----
+### Installation
 
-### 🔌 Backend Setup
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/react-url-shortener.git
+   cd react-url-shortener
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**
+   ```bash
+   npm start
+   ```
+
+4. **Open your browser**
+   Navigate to `http://localhost:3000` to see the application.
+
+### Building for Production
 
 ```bash
-cd backend
-npm install
-node server.js
+npm run build
 ```
-Update serviceAccountKey.json.json with your Firebase Admin credentials.
 
-### 🌐 Frontend Setup
+This creates an optimized production build in the `build` folder.
+
+## 📱 Usage
+
+### Creating Short URLs
+
+1. **Single URL**:
+   - Enter a long URL in the input field
+   - Optionally specify a custom shortcode (3-20 alphanumeric characters)
+   - Optionally set an expiry period in hours
+   - Click "Shorten URLs"
+
+2. **Multiple URLs**:
+   - Click "Add URL" to add up to 5 URL inputs
+   - Fill in each URL with optional custom settings
+   - Process all URLs at once
+
+### Managing URLs
+
+1. **View Statistics**:
+   - Click "View Detailed Analytics" or use the Statistics navigation
+   - View comprehensive analytics including click counts, creation dates, and status
+
+2. **Search and Filter**:
+   - Use the search bar to find specific URLs or shortcodes
+   - Filter by status: All, Active, Expired, Permanent, or Expiring
+
+3. **Export Data**:
+   - Click "Export Data" to download your URLs and statistics as JSON
+
+### URL Redirection
+
+When someone visits a short URL:
+1. The application looks up the original URL
+2. Checks if the URL has expired
+3. Increments the click counter
+4. Shows a countdown before redirecting
+5. Allows manual redirection or cancellation
+
+## 🏗️ Architecture
+
+### Project Structure
+
+```
+src/
+├── components/
+│   ├── ShortenerForm.jsx      # Main URL input form
+│   ├── ShortenedURLCard.jsx   # Display component for shortened URLs
+│   ├── StatisticsTable.jsx    # Analytics table with sorting/filtering
+│   └── RedirectHandler.jsx    # Handles short URL redirections
+├── pages/
+│   ├── ShortenerPage.jsx      # Main application page
+│   └── StatisticsPage.jsx     # Analytics and management page
+├── utils/
+│   ├── urlUtils.js           # URL validation and processing utilities
+│   ├── storage.js            # localStorage management
+│   └── loggerMiddleware.js   # Logging and error tracking
+├── App.js                    # Main application component with routing
+└── index.js                  # Application entry point
+```
+
+### Core Components
+
+#### 1. **ShortenerForm**
+- Handles up to 5 URL inputs
+- Real-time validation for URLs, shortcodes, and validity periods
+- Batch processing with error handling
+- Material UI form components with responsive design
+
+#### 2. **StatisticsTable**
+- Sortable and filterable data table
+- Real-time search functionality
+- Bulk operations (cleanup, delete)
+- Export capabilities
+
+#### 3. **RedirectHandler**
+- Processes short URL access
+- Manages click tracking
+- Handles expired URL scenarios
+- Provides user-friendly redirect experience
+
+#### 4. **Storage Management**
+- Efficient localStorage operations
+- Data validation and error handling
+- Automatic cleanup of expired URLs
+- Collision detection for custom shortcodes
+
+### State Management
+
+The application uses React's built-in state management:
+- **Local Component State**: For form inputs and UI state
+- **localStorage**: For persistent data storage
+- **Context-free Architecture**: Simple prop passing for clean data flow
+
+### Data Flow
+
+1. **URL Creation**: Form → Validation → Storage → Display
+2. **Analytics**: Storage → Processing → Display with filtering/sorting
+3. **Redirection**: URL Access → Lookup → Validation → Redirect + Analytics
+
+## 🛠️ Technical Implementation
+
+### URL Validation
+- Comprehensive regex patterns for URL validation
+- Protocol normalization (adds https:// if missing)
+- Domain validation and format checking
+
+### Shortcode Generation
+- Cryptographically random 6-character codes
+- Collision detection and retry logic
+- Custom shortcode validation (3-20 alphanumeric characters)
+
+### Click Tracking
+- Atomic increment operations
+- Expiry checking before tracking
+- Detailed access logging
+
+### Error Handling
+- Application-level error boundaries
+- Graceful fallbacks for storage failures
+- User-friendly error messages
+- Comprehensive logging system
+
+### Logging Middleware
+- Structured logging with categories and levels
+- Browser storage for log persistence
+- Console output with styling
+- Error aggregation and reporting
+
+## 🎨 UI/UX Design
+
+### Material UI Implementation
+- **Theme Customization**: Custom color palette and typography
+- **Responsive Design**: Mobile-first approach with breakpoints
+- **Component Library**: Buttons, Cards, Tables, Forms, Icons
+- **Accessibility**: ARIA labels, keyboard navigation, color contrast
+
+### Key Components Used
+- `TextField`: URL and shortcode inputs
+- `Button`: Actions and navigation
+- `Card`: Content organization
+- `Table`: Data display with sorting
+- `Chip`: Status indicators and filters
+- `Alert`: Success and error messages
+- `Dialog`: Confirmations and modals
+
+### Design Principles
+- **Consistency**: Unified spacing, colors, and typography
+- **Clarity**: Clear labels, helpful tooltips, and status indicators
+- **Efficiency**: Minimal clicks to accomplish tasks
+- **Feedback**: Immediate visual feedback for all actions
+
+## 📊 Data Management
+
+### Local Storage Strategy
+- **Key Namespacing**: Prefixed keys to avoid conflicts
+- **Data Validation**: Schema validation for stored data
+- **Error Recovery**: Graceful handling of corrupted data
+- **Size Management**: Automatic cleanup to prevent storage limits
+
+### Data Structure
+```javascript
+// URL Mapping
+{
+  shortcode: "abc123",
+  originalUrl: "https://example.com/very-long-url",
+  createdAt: "2024-01-01T12:00:00.000Z",
+  expiryDate: "2024-01-02T12:00:00.000Z", // or null
+  clickCount: 5
+}
+
+// Statistics
+{
+  totalUrls: 10,
+  totalClicks: 50,
+  activeUrls: 8,
+  expiredUrls: 2
+}
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+- `NODE_ENV`: Development/production mode
+- Custom configurations can be added via `.env` files
+
+### Browser Support
+- Modern browsers with ES6+ support
+- Chrome 70+, Firefox 65+, Safari 12+, Edge 79+
+- Progressive enhancement for older browsers
+
+### Storage Limits
+- Typical localStorage limit: 5-10MB per domain
+- Automatic cleanup when approaching limits
+- Export functionality for data backup
+
+## 🚀 Deployment
+
+### Static Hosting
+The application can be deployed to any static hosting service:
+
+#### Netlify
 ```bash
-
-cd frontend# If using Create React App
-npm install
-npm start
+npm run build
+# Upload build folder to Netlify
 ```
-## 📚 Topics & Tags
-<p align="left"> <a href="https://github.com/topics/chatbot" target="_blank"> <img src="https://img.shields.io/badge/-Chatbot-0A0A0A?style=for-the-badge&logo=openai&logoColor=white" alt="Chatbot"/> </a> <a href="https://github.com/topics/voice-commands" target="_blank"> <img src="https://img.shields.io/badge/-Voice_Commands-0A0A0A?style=for-the-badge&logo=soundcloud&logoColor=white" alt="Voice Commands"/> </a> <a href="https://github.com/topics/image-processing" target="_blank"> <img src="https://img.shields.io/badge/-Image_Processing-0A0A0A?style=for-the-badge&logo=opencv&logoColor=white" alt="Image Processing"/> </a> <a href="https://github.com/topics/nlp" target="_blank"> <img src="https://img.shields.io/badge/-NLP-0A0A0A?style=for-the-badge&logo=amazon-lex&logoColor=white" alt="NLP"/> </a> <a href="https://github.com/topics/machine-learning" target="_blank"> <img src="https://img.shields.io/badge/-Machine_Learning-0A0A0A?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="Machine Learning"/> </a> <a href="https://github.com/topics/llm" target="_blank"> <img src="https://img.shields.io/badge/-LLM_Training-0A0A0A?style=for-the-badge&logo=meta&logoColor=white" alt="LLM Training"/> </a> <a href="https://github.com/topics/firebase" target="_blank"> <img src="https://img.shields.io/badge/-Firebase-0A0A0A?style=for-the-badge&logo=firebase&logoColor=white" alt="Firebase"/> </a> <a href="https://github.com/topics/ollama" target="_blank"> <img src="https://img.shields.io/badge/-Ollama-0A0A0A?style=for-the-badge&logo=vercel&logoColor=white" alt="Ollama"/> </a> <a href="https://ollama.com/library/llama3" target="_blank"> <img src="https://img.shields.io/badge/-LLaMA_3-0A0A0A?style=for-the-badge&logo=meta&logoColor=white" alt="LLaMA 3"/> </a> <a href="https://ollama.com/library/llava" target="_blank"> <img src="https://img.shields.io/badge/-LLaVA-0A0A0A?style=for-the-badge&logo=github&logoColor=white" alt="LLaVA"/> </a> </p>
 
-## 🙋‍♂️ Author
-<table> <tr> <td align="left" valign="middle" width="50"> <img src="https://avatars.githubusercontent.com/22bq1a42d4" width="48" style="border-radius: 50%;" alt="Author Avatar"/> </td> <td valign="middle"> <strong>Seelam Abhinav</strong> <br/> <sub>Student @ VVIT</sub> <br/> <a href="https://github.com/22bq1a42d4" target="_blank"> <img src="https://img.shields.io/badge/-GitHub_Profile-0A0A0A?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Profile"/> </a> </td> </tr> </table>
+#### Vercel
+```bash
+npm run build
+npx vercel --prod
+```
 
+#### GitHub Pages
+```bash
+npm install --save-dev gh-pages
+npm run build
+npx gh-pages -d build
+```
+
+### Custom Domain Setup
+1. Configure your hosting service for custom domain
+2. Update any hardcoded URLs in the application
+3. Set up HTTPS (required for modern browser features)
+
+## 🧪 Testing
+
+### Manual Testing Checklist
+- [ ] URL validation with various formats
+- [ ] Custom shortcode collision handling
+- [ ] Expiry date functionality
+- [ ] Click tracking accuracy
+- [ ] Data export/import
+- [ ] Responsive design across devices
+- [ ] Browser compatibility
+
+### Performance Testing
+- [ ] Large dataset handling (1000+ URLs)
+- [ ] Concurrent URL creation
+- [ ] Search and filter performance
+- [ ] Memory usage monitoring
+
+## 🤝 Contributing
+
+### Development Setup
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Make your changes with proper documentation
+4. Test thoroughly across different browsers
+5. Submit a pull request with detailed description
+
+### Code Style
+- Follow React functional component patterns
+- Use Material UI components consistently
+- Implement proper error handling
+- Add JSDoc comments for functions
+- Follow the existing project structure
+
+### Bug Reports
+When reporting bugs, please include:
+- Browser and version
+- Steps to reproduce
+- Expected vs actual behavior
+- Console errors (if any)
+- Sample URLs that cause issues
 
 ## 📄 License
-This project is open-source and available under the MIT License.
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **React Team**: For the excellent React framework
+- **Material UI Team**: For the comprehensive component library
+- **Open Source Community**: For inspiration and best practices
+
+## 📞 Support
+
+For support, questions, or suggestions:
+- Create an issue on GitHub
+- Check existing issues for similar problems
+- Refer to this README for common questions
 
 ---
+
+**Made with ❤️ using React and Material UI**
 
