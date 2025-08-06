@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Assistant - Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // IMPORTANT: REPLACE THESE PLACEHOLDER VALUES WITH YOUR ACTUAL FIREBASE PROJECT CONFIGURATION!
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdyoX0It3p92O_N5wVbHL35jRqajnb5Dk",
+            authDomain: "ai-assistant-e49ab.firebaseapp.com",
+            projectId: "ai-assistant-e49ab",
+            storageBucket: "ai-assistant-e49ab.firebasestorage.app",
+            messagingSenderId: "173847201187",
+            appId: "1:173847201187:web:0047b2c57e933b63dc8616",
+            measurementId: "G-G0H0F6KSPP"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Make Firebase objects and functions globally accessible for this page
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        window.firebaseOnAuthStateChanged = onAuthStateChanged;
+        window.firebaseSetDoc = setDoc;
+        window.firebaseGetDoc = getDoc;
+        window.firebaseDoc = doc;
+        window.firebaseSignOut = signOut; // Expose signOut for this page
+    </script>
+
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary-dark: #1E1E2C;
+            --secondary-dark: #2A2A3D;
+            --text-light: #E2E8F0;
+            --text-muted: #A0AEC0;
+            --accent-blue: #00BFFF;
+            --accent-blue-dark: #009ACD;
+            --accent-green: #32CD32;
+            --accent-green-dark: #228B22;
+            --accent-red: #FF4500;
+            --accent-red-dark: #CD3700;
+            --border-color: #5A5A70;
+            --shadow-dark: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Base Styles */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: var(--primary-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Use min-height for content flexibility */
+            color: var(--text-light);
+            overflow-y: auto; /* Allow scrolling for content overflow */
+            position: relative;
+            background-image: radial-gradient(circle at center, var(--primary-dark) 0%, #0c0c16 100%);
+            animation: backgroundPulse 15s infinite alternate ease-in-out;
+        }
+
+        @keyframes backgroundPulse {
+            0% { background-color: var(--primary-dark); background-position: 0% 0%; }
+            50% { background-color: #12121e; background-position: 100% 100%; }
+            100% { background-color: var(--primary-dark); background-position: 0% 0%; }
+        }
+
+        /* Profile Container */
+        .profile-container {
+            width: 95%;
+            max-width: 700px; /* Increased max-width for better layout */
+            margin: 40px auto; /* Added top/bottom margin for spacing */
+            background-color: rgba(42, 42, 61, 0.95);
+            box-shadow: 0 20px 60px var(--shadow-dark), 0 0 30px rgba(0, 191, 255, 0.3);
+            border-radius: 25px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            animation: fadeInScale 0.7s ease-out;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: translateY(50px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .profile-header {
+            padding: 18px;
+            background: linear-gradient(90deg, var(--accent-blue-dark), var(--accent-blue));
+            color: white;
+            text-align: center;
+            font-size: 1.6em;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* To push back button to one side */
+            gap: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            position: relative;
+            z-index: 2;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-header i {
+            font-size: 1.3em;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .profile-header .back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em; /* Larger back icon */
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            text-decoration: none; /* Remove underline for anchor */
+        }
+        .profile-header .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        .profile-header .title {
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .profile-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px; /* Increased padding */
+            background-color: var(--primary-dark);
+        }
+
+        .profile-card {
+            background-color: var(--secondary-dark);
+            padding: 40px; /* Increased padding */
+            border-radius: 20px; /* More rounded */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6); /* Deeper shadow */
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* Increased gap */
+            width: 100%;
+            max-width: 500px; /* Max width for the card */
+            border: 1px solid var(--border-color);
+        }
+
+        .profile-card h2 {
+            text-align: center;
+            color: var(--accent-blue);
+            margin-bottom: 25px; /* Increased margin */
+            font-size: 2em; /* Larger font size */
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Display Mode Styles */
+        .profile-display-mode {
+            display: flex; /* Shown by default */
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .profile-display-mode p {
+            font-size: 1.1em;
+            color: var(--text-light);
+            line-height: 1.6;
+            margin: 0; /* Remove default paragraph margin */
+        }
+        .profile-display-mode p strong {
+            display: block;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+        .profile-display-mode p span {
+            display: block;
+            font-weight: 500;
+            color: var(--accent-blue);
+            font-size: 1.1em;
+        }
+
+        /* Edit Mode Styles */
+        .profile-edit-mode {
+            display: none; /* Hidden by default, toggled by JS */
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .profile-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .profile-form-group label {
+            font-size: 1em; /* Larger label font */
+            color: var(--text-muted);
+            margin-bottom: -5px;
+            font-weight: 500;
+        }
+
+        .profile-card input {
+            padding: 14px 20px; /* Increased padding */
+            border: 1px solid var(--border-color);
+            border-radius: 30px; /* More rounded */
+            font-size: 1.1em; /* Larger font size */
+            outline: none;
+            background-color: var(--primary-dark);
+            color: var(--text-light);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.3); /* Deeper inner shadow */
+        }
+
+        .profile-card input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.9;
+        }
+
+        .profile-card input:focus {
+            border-color: var(--accent-blue);
+            box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.4), 0 0 0 6px rgba(0, 191, 255, 0.4); /* Stronger glow */
+        }
+
+        .profile-buttons {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping for responsiveness */
+            gap: 15px; /* Increased gap */
+            justify-content: center;
+            margin-top: 30px; /* Increased margin */
+        }
+
+        .profile-card button {
+            flex: 1 1 auto; /* Allow buttons to grow/shrink */
+            max-width: 200px; /* Max width for individual buttons */
+            padding: 14px 25px; /* Increased padding */
+            border: none;
+            border-radius: 30px; /* More rounded */
+            color: white;
+            font-weight: 600;
+            font-size: 1em; /* Larger font size */
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-green-dark));
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .profile-card button i {
+            font-size: 1em;
+        }
+
+        .profile-card button:hover {
+            background: linear-gradient(90deg, var(--accent-green-dark), var(--accent-green));
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 25px var(--shadow-dark);
+        }
+
+        .profile-card button:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.6);
+        }
+
+        .edit-btn {
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-blue-dark)) !important;
+        }
+        .edit-btn:hover {
+            background: linear-gradient(90deg, var(--accent-blue-dark), var(--accent-blue)) !important;
+        }
+        .cancel-btn {
+            background: linear-gradient(90deg, #6C757D, #5A6268) !important;
+        }
+        .cancel-btn:hover {
+            background: linear-gradient(90deg, #5A6268, #6C757D) !important;
+        }
+        .logout-btn {
+            background: linear-gradient(90deg, var(--accent-red), var(--accent-red-dark)) !important;
+        }
+        .logout-btn:hover {
+            background: linear-gradient(90deg, var(--accent-red-dark), var(--accent-red)) !important;
+        }
+
+        .status-message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .profile-container {
+                width: 100%;
+                min-height: 100vh; /* Ensure it takes full height on mobile */
+                margin: 0; /* Remove margin on mobile */
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .profile-header {
+                font-size: 1.4em;
+                padding: 15px;
+            }
+            .profile-header i {
+                font-size: 1.1em;
+            }
+            .profile-card {
+                padding: 25px;
+                gap: 15px;
+                border-radius: 10px;
+                box-shadow: none;
+            }
+            .profile-card h2 {
+                font-size: 1.5em;
+                margin-bottom: 15px;
+            }
+            .profile-display-mode p,
+            .profile-display-mode p span {
+                font-size: 1em;
+            }
+            .profile-form-group label {
+                font-size: 0.9em;
+            }
+            .profile-card input {
+                padding: 10px 15px;
+                font-size: 0.9em;
+                border-radius: 20px;
+            }
+            .profile-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                margin-top: 15px;
+            }
+            .profile-card button {
+                max-width: 100%;
+                padding: 10px 15px;
+                font-size: 0.9em;
+                border-radius: 20px;
+            }
+            .status-message {
+                margin-top: 10px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">
+            <a href="index.html" id="backToChatBtn" class="back-btn" title="Back to Chat"><i class="fas fa-arrow-left"></i></a>
+            <span class="title">Your Profile</span>
+            <!-- No logout button here, it's inside the form now -->
+        </div>
+        <div class="profile-content">
+            <div class="profile-card">
+                <h2>User Profile</h2>
+                
+                <!-- Display Mode -->
+                <div id="displayMode" class="profile-display-mode">
+                    <p><strong>Email:</strong> <span id="profileEmailDisplay"></span></p>
+                    <p><strong>Name:</strong> <span id="profileNameDisplay">Not set</span></p>
+                    <p><strong>Phone:</strong> <span id="profilePhoneDisplay">Not set</span></p>
+                    <div class="profile-buttons">
+                        <button type="button" id="editProfileBtn" class="edit-btn"><i class="fas fa-edit"></i> Edit Profile</button>
+                        <button type="button" id="logoutBtnDisplay" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    </div>
+                </div>
+
+                <!-- Edit Mode -->
+                <form id="editMode" class="profile-edit-mode">
+                    <div class="profile-form-group">
+                        <label for="profileName">Name:</label>
+                        <input type="text" id="profileName" placeholder="Your Name" autocomplete="name"/>
+                    </div>
+                    <div class="profile-form-group">
+                        <label for="profilePhone">Phone Number:</label>
+                        <input type="tel" id="profilePhone" placeholder="e.g., +1234567890" autocomplete="tel"/>
+                    </div>
+                    <div class="profile-buttons">
+                        <button type="submit" id="saveProfileBtn"><i class="fas fa-save"></i> Save Changes</button>
+                        <button type="button" id="cancelEditBtn" class="cancel-btn"><i class="fas fa-times-circle"></i> Cancel</button>
+                        <button type="button" id="logoutBtnEdit" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    </div>
+                    <p id="profileMessage" class="status-message" style="color: var(--accent-red);"></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const auth = window.firebaseAuth;
+            const db = window.firebaseDb;
+            const onAuthStateChanged = window.firebaseOnAuthStateChanged;
+            const setDoc = window.firebaseSetDoc;
+            const getDoc = window.firebaseGetDoc;
+            const doc = window.firebaseDoc;
+            const signOut = window.firebaseSignOut;
+
+            // Get DOM elements
+            const displayMode = document.getElementById('displayMode');
+            const editMode = document.getElementById('editMode');
+            const profileEmailDisplay = document.getElementById('profileEmailDisplay');
+            const profileNameDisplay = document.getElementById('profileNameDisplay');
+            const profilePhoneDisplay = document.getElementById('profilePhoneDisplay');
+            const profileNameInput = document.getElementById('profileName');
+            const profilePhoneInput = document.getElementById('profilePhone');
+            const editProfileBtn = document.getElementById('editProfileBtn');
+            const saveProfileBtn = document.getElementById('saveProfileBtn');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+            const logoutBtnDisplay = document.getElementById('logoutBtnDisplay'); // Logout button in display mode
+            const logoutBtnEdit = document.getElementById('logoutBtnEdit');     // Logout button in edit mode
+            const profileMessage = document.getElementById('profileMessage');
+            const backToChatBtn = document.getElementById('backToChatBtn');
+
+            let currentUserId = null;
+
+            // Function to switch modes
+            function showDisplayMode() {
+                displayMode.style.display = 'flex';
+                editMode.style.display = 'none';
+                profileMessage.textContent = ''; // Clear message when switching
+            }
+
+            function showEditMode() {
+                displayMode.style.display = 'none';
+                editMode.style.display = 'flex';
+                profileMessage.textContent = ''; // Clear message when switching
+            }
+
+            // Authentication State Change Listener
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    currentUserId = user.uid;
+                    await loadUserProfile(currentUserId);
+                    showDisplayMode(); // Show display mode by default
+                } else {
+                    window.location.href = 'login.html'; // Redirect to login if not authenticated
+                }
+            });
+
+            // Load User Profile Data into Display and Edit Forms
+            async function loadUserProfile(uid) {
+                profileMessage.textContent = ''; // Clear previous messages
+                if (!uid) {
+                    profileEmailDisplay.textContent = 'N/A';
+                    profileNameDisplay.textContent = 'Not set';
+                    profilePhoneDisplay.textContent = 'Not set';
+                    profileNameInput.value = '';
+                    profilePhoneInput.value = '';
+                    return;
+                }
+                
+                profileEmailDisplay.textContent = auth.currentUser.email || 'N/A';
+
+                try {
+                    const userDoc = await getDoc(doc(db, "users", uid));
+                    if (userDoc.exists()) {
+                        const data = userDoc.data();
+                        profileNameDisplay.textContent = data.name || 'Not set';
+                        profilePhoneDisplay.textContent = data.phoneNumber || 'Not set';
+                        profileNameInput.value = data.name || ''; // Pre-fill edit form
+                        profilePhoneInput.value = data.phoneNumber || ''; // Pre-fill edit form
+                    } else {
+                        profileNameDisplay.textContent = 'Not set';
+                        profilePhoneDisplay.textContent = 'Not set';
+                        profileNameInput.value = '';
+                        profilePhoneInput.value = '';
+                    }
+                } catch (error) {
+                    console.error("Error loading profile data:", error);
+                    profileMessage.textContent = "Failed to load profile data.";
+                    profileMessage.style.color = 'var(--accent-red)';
+                }
+            }
+
+            // Event Listeners for Mode Switching
+            editProfileBtn.addEventListener('click', () => {
+                showEditMode();
+            });
+
+            cancelEditBtn.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent form submission
+                showDisplayMode();
+                // Re-load to revert any unsaved changes in the form
+                if (currentUserId) {
+                    loadUserProfile(currentUserId);
+                }
+            });
+
+            // Save Profile Functionality
+            editMode.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                profileMessage.textContent = '';
+                if (!currentUserId) {
+                    profileMessage.textContent = "No user logged in.";
+                    profileMessage.style.color = 'var(--accent-red)';
+                    return;
+                }
+                const name = profileNameInput.value;
+                const phoneNumber = profilePhoneInput.value;
+
+                try {
+                    await setDoc(doc(db, "users", currentUserId), {
+                        name: name,
+                        phoneNumber: phoneNumber
+                    }, { merge: true });
+                    profileMessage.textContent = 'Profile updated successfully!';
+                    profileMessage.style.color = 'var(--accent-green)';
+                    await loadUserProfile(currentUserId); // Reload to display updated info
+                    showDisplayMode(); // Switch back to display mode
+                } catch (error) {
+                    profileMessage.textContent = `Error updating profile: ${error.message}`;
+                    profileMessage.style.color = 'var(--accent-red)';
+                    console.error("Error updating profile:", error);
+                }
+            });
+
+            // Logout Button Functionality (both modes)
+            const handleLogout = async () => {
+                try {
+                    await signOut(auth);
+                    // Redirection to login.html will be handled by onAuthStateChanged
+                } catch (error) {
+                    console.error("Logout Error:", error);
+                    profileMessage.textContent = `Logout failed: ${error.message}`;
+                    profileMessage.style.color = 'var(--accent-red)';
+                }
+            };
+            logoutBtnDisplay.addEventListener('click', handleLogout);
+            logoutBtnEdit.addEventListener('click', handleLogout);
+
+            // Back to Chat Button
+            backToChatBtn.addEventListener('click', () => {
+                window.location.href = 'index.html';
+            });
+        });
+    </script>
+</body>
+</html>
