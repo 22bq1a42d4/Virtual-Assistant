@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Virtual Assistant at Contact Centre</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Enhanced Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      --dark-gradient: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%);
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --text-primary: #ffffff;
+      --text-secondary: #e2e8f0;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background: var(--dark-gradient);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    h1, h2, h3, h4, .font-bold {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+    }
+
+    /* Enhanced Hero Section */
+    .hero-section {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+    }
+
+         #hero-video {
+       position: absolute;
+       top: 50%;
+       left: 50%;
+       width: 120%;
+       height: 120%;
+       object-fit: cover;
+       transform: translate(-50%, -50%);
+       z-index: 1;
+       opacity: 0.6;
+       filter: blur(0.5px) brightness(1.2);
+     }
+
+         .hero-overlay {
+       position: absolute;
+       top: 0;
+       left: 0;
+       width: 100%;
+       height: 100%;
+       background: radial-gradient(ellipse at center, rgba(15, 15, 35, 0.2) 0%, rgba(15, 15, 35, 0.6) 100%);
+       z-index: 2;
+     }
+
+    .hero-content {
+      position: relative;
+      z-index: 3;
+      text-align: center;
+      padding: 0 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .hero-title {
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-title .word-wrapper {
+      display: inline-block;
+      overflow: hidden;
+      margin: 0 0.2rem;
+    }
+
+    .hero-title .word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(100%) rotateX(90deg);
+      animation: revealWord 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+
+    .hero-title .word-wrapper:nth-child(1) .word { animation-delay: 0.1s; }
+    .hero-title .word-wrapper:nth-child(2) .word { animation-delay: 0.2s; }
+    .hero-title .word-wrapper:nth-child(3) .word { animation-delay: 0.3s; }
+    .hero-title .word-wrapper:nth-child(4) .word { animation-delay: 0.4s; }
+    .hero-title .word-wrapper:nth-child(5) .word { animation-delay: 0.5s; }
+    .hero-title .word-wrapper:nth-child(6) .word { animation-delay: 0.6s; }
+    .hero-title .word-wrapper:nth-child(7) .word { animation-delay: 0.7s; }
+
+    @keyframes revealWord {
+      from {
+        opacity: 0;
+        transform: translateY(100%) rotateX(90deg);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) rotateX(0deg);
+      }
+    }
+
+    .hero-title .highlight {
+      background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #4facfe);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 3s ease-in-out infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .hero-subtitle {
+      max-width: 48rem;
+      margin: 0 auto 2.5rem;
+      color: var(--text-secondary);
+      font-size: 1.25rem;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 1s ease-out 0.8s forwards;
+    }
+    
+    .cta-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 2.5rem;
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: white;
+      background: var(--primary-gradient);
+      border-radius: 50px;
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 1s ease-out 1.2s forwards;
+    }
+
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .cta-button:hover::before {
+      left: 100%;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-8px) scale(1.05);
+      box-shadow: 0 30px 60px rgba(102, 126, 234, 0.4);
+      background: var(--secondary-gradient);
+    }
+
+    /* Enhanced Header */
+    .header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 10;
+      padding: 1.5rem 2rem;
+      background: rgba(15, 15, 35, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1.5rem;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .login-button {
+      padding: 0.75rem 1.5rem;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      color: var(--text-primary);
+      border-radius: 25px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .login-button:hover {
+      background: var(--primary-gradient);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+         /* Enhanced Feature Cards */
+     .feature-card {
+       background: rgba(255, 255, 255, 0.95);
+       backdrop-filter: blur(20px) saturate(180%);
+       border: 1px solid rgba(0, 0, 0, 0.1);
+       border-radius: 24px;
+       padding: 2rem 1.5rem;
+       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+       position: relative;
+       overflow: hidden;
+       min-height: 280px;
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       text-align: center;
+     }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .feature-card:hover::before {
+      left: 100%;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-12px) scale(1.02);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+      border-color: rgba(102, 126, 234, 0.5);
+    }
+
+    .feature-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-icon::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: inherit;
+      filter: blur(10px);
+      opacity: 0.6;
+      transform: scale(1.1);
+    }
+
+    .feature-icon i {
+      position: relative;
+      z-index: 1;
+    }
+
+    .icon-blue { background: var(--primary-gradient); }
+    .icon-purple { background: var(--secondary-gradient); }
+    .icon-green { background: var(--success-gradient); }
+    .icon-cyan { background: var(--accent-gradient); }
+
+         .feature-title {
+       font-size: 1.25rem;
+       font-weight: 600;
+       color: #1a202c;
+       margin-bottom: 0.75rem;
+     }
+
+     .feature-description {
+       color: #4a5568;
+       line-height: 1.6;
+       flex-grow: 1;
+     }
+
+    /* Enhanced Video Section */
+    .va-video {
+      border-radius: 24px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+      object-fit: cover;
+      width: 100%;
+      max-width: 500px;
+      aspect-ratio: 16 / 9;
+      border: 2px solid var(--glass-border);
+      transition: all 0.4s ease;
+    }
+
+    .va-video:hover {
+      transform: scale(1.02);
+      box-shadow: 0 35px 70px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Enhanced Flip Cards */
+    .flip-card {
+      perspective: 1200px;
+      min-height: 320px;
+      cursor: pointer;
+    }
+
+    .flip-card-inner {
+      transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      transform-style: preserve-3d;
+      position: relative;
+      min-height: 300px;
+    }
+
+    .flip-card.flipped .flip-card-inner { 
+      transform: rotateY(180deg);
+    }
+
+    .flip-card-front, .flip-card-back {
+      backface-visibility: hidden;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 24px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+         .flip-card-front {
+       background: rgba(255, 255, 255, 0.95);
+       backdrop-filter: blur(20px);
+       border: 1px solid rgba(0, 0, 0, 0.1);
+       color: #1a202c;
+     }
+
+         .flip-card-back {
+       background: var(--primary-gradient);
+       color: white;
+       transform: rotateY(180deg);
+       position: relative;
+       overflow: hidden;
+       z-index: 1;
+     }
+
+     .flip-card-back::before {
+       content: '';
+       position: absolute;
+       top: 0;
+       left: 0;
+       right: 0;
+       bottom: 0;
+       background: var(--secondary-gradient);
+       opacity: 0;
+       transition: opacity 0.3s ease;
+       z-index: -1;
+     }
+
+     .flip-card-back > div {
+       position: relative;
+       z-index: 2;
+     }
+
+     .flip-card:hover .flip-card-back::before {
+       opacity: 0.3;
+     }
+
+    /* Enhanced Sections */
+    .section-light {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      color: #1a202c;
+    }
+
+    .section-dark {
+      background: var(--dark-gradient);
+      color: var(--text-primary);
+    }
+
+    .section-gradient {
+      background: var(--primary-gradient);
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section-gradient::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--secondary-gradient);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .section-gradient:hover::before {
+      opacity: 0.1;
+    }
+
+    /* Enhanced Button */
+    .button-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: var(--primary-gradient);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      font-weight: 600;
+      box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .button-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .button-primary:hover::before {
+      left: 100%;
+    }
+
+    .button-primary:hover {
+      transform: translateY(-6px) scale(1.05);
+      box-shadow: 0 25px 50px rgba(102, 126, 234, 0.5);
+      background: var(--secondary-gradient);
+    }
+
+    /* Enhanced Scroll Animations */
+    .scroll-animate {
+      opacity: 0;
+      transform: translateY(50px);
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .scroll-animate.animate {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+    .delay-4 { transition-delay: 0.4s; }
+    .delay-5 { transition-delay: 0.5s; }
+    .delay-6 { transition-delay: 0.6s; }
+    .delay-7 { transition-delay: 0.7s; }
+    .delay-8 { transition-delay: 0.8s; }
+    .delay-9 { transition-delay: 0.9s; }
+
+    /* Enhanced Wave Dividers */
+    .wave-divider {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .wave-divider svg {
+      width: 100%;
+      height: 60px;
+      transition: all 0.3s ease;
+    }
+
+    .wave-divider:hover svg {
+      transform: scale(1.02);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.5rem !important;
+      }
+      
+      .hero-subtitle {
+        font-size: 1.1rem;
+        padding: 0 1rem;
+      }
+      
+      .feature-card {
+        min-height: 250px;
+      }
+      
+      .flip-card-front, .flip-card-back {
+        position: static;
+        min-height: unset;
+      }
+      
+      .flip-card-inner {
+        transform: none !important;
+      }
+      
+      .flip-card-back {
+        display: none;
+      }
+      
+      .flip-card.show-back .flip-card-back {
+        display: flex;
+      }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary-gradient);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--secondary-gradient);
+    }
+  </style>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Enhanced Scroll Animation
+      function revealOnScroll() {
+        const reveals = document.querySelectorAll('.scroll-animate');
+        for (let i = 0; i < reveals.length; i++) {
+          const windowHeight = window.innerHeight;
+          const revealTop = reveals[i].getBoundingClientRect().top;
+          const revealPoint = 80; 
+          if (revealTop < windowHeight - revealPoint) {
+            reveals[i].classList.add('animate');
+          }
+        }
+      }
+      
+      window.addEventListener('scroll', revealOnScroll);
+      revealOnScroll();
+
+      // Enhanced Card Flip
+      document.querySelectorAll('.flip-card').forEach(function(card){
+        card.addEventListener('click', function(){
+          if (window.innerWidth > 768) {
+            card.classList.toggle('flipped');
+          } else {
+            card.classList.toggle('show-back');
+          }
+        });
+      });
+
+      // Parallax Effect for Hero Video
+      window.addEventListener('scroll', function() {
+        const scrolled = window.pageYOffset;
+        const video = document.getElementById('hero-video');
+        if (video) {
+          video.style.transform = `translate(-50%, -50%) translateY(${scrolled * 0.5}px)`;
+        }
+      });
+
+      // Enhanced Mouse Following Effect
+      document.addEventListener('mousemove', function(e) {
+        const cards = document.querySelectorAll('.feature-card, .flip-card');
+        cards.forEach(card => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          
+          if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = (y - centerY) / 10;
+            const rotateY = (centerX - x) / 10;
+            
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;
+          } else {
+            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
+          }
+        });
+      });
+    });
+  </script>
+</head>
+
+<body>
+
+<!-- ENHANCED HEADER -->
+<header class="header">
+    <div class="container mx-auto flex justify-between items-center">
+        <!-- Enhanced Logo -->
+        <a href="#" class="logo flex items-center gap-3">
+            <i class="fas fa-robot text-2xl"></i>
+            VirtualAI
+        </a>
+        <!-- Enhanced Navigation -->
+        <nav class="hidden md:flex items-center gap-8">
+            <a href="#features" class="text-gray-300 hover:text-white transition-colors">Features</a>
+            <a href="#how-it-works" class="text-gray-300 hover:text-white transition-colors">How It Works</a>
+            <a href="#solutions" class="text-gray-300 hover:text-white transition-colors">Solutions</a>
+        </nav>
+        <!-- Enhanced Login Button -->
+        <a href="login.html" class="login-button">
+            <i class="fas fa-sign-in-alt mr-2"></i>
+            Login
+        </a>
+    </div>
+</header>
+
+<!-- ENHANCED HERO SECTION -->
+<section class="hero-section">
+    <video id="hero-video" autoplay muted loop playsinline poster="https://placehold.co/1920x1080/0a0a1a/e0e0e0?text=Loading...">
+        <source src="Videos/back.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <h1 class="hero-title text-4xl sm:text-5xl lg:text-7xl leading-tight">
+            <span class="word-wrapper"><span class="word highlight">Virtual</span></span>
+            <span class="word-wrapper"><span class="word highlight">Assistant</span></span>
+            <br />
+            <span class="word-wrapper"><span class="word">for</span></span>
+            <span class="word-wrapper"><span class="word">the</span></span>
+            <span class="word-wrapper"><span class="word">Next-Gen</span></span>
+            <br />
+            <span class="word-wrapper"><span class="word">Contact</span></span>
+            <span class="word-wrapper"><span class="word">Centre</span></span>
+        </h1>
+        <p class="hero-subtitle">
+            Empower your customer experience with intelligent AI that works 24/7 — automation, personalization, and data insights all in one solution.
+        </p>
+        <a href="login.html" class="cta-button">
+            <i class="fas fa-rocket"></i>
+            Get Started Now
+        </a>
+    </div>
+</section>
+
+<!-- ENHANCED WAVE DIVIDER -->
+<div class="wave-divider" style="background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);">
+    <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 64C320 128 800 -32 1440 64V100H0V64Z" fill="url(#wave-gradient)"/>
+      <defs>
+        <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#f8fafc;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#e2e8f0;stop-opacity:1" />
+        </linearGradient>
+      </defs>
+    </svg>
+</div>
+
+<!-- ENHANCED WHY CHOOSE US SECTION -->
+<section id="features" class="section-light py-20">
+  <div class="container mx-auto px-6">
+    <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 text-gray-800 scroll-animate">
+      Why Choose Our Virtual Assistant?
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Enhanced Card 1 -->
+      <div class="feature-card scroll-animate delay-1">
+        <div class="feature-icon icon-blue">
+          <i class="fas fa-clock"></i>
+        </div>
+        <h3 class="feature-title">24/7 Availability</h3>
+        <p class="feature-description">Always on — resolve queries instantly, even outside business hours with intelligent automation.</p>
+      </div>
+      
+      <!-- Enhanced Card 2 -->
+      <div class="feature-card scroll-animate delay-2">
+        <div class="feature-icon icon-purple">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <h3 class="feature-title">Cost Efficiency</h3>
+        <p class="feature-description">Automates queries, deflects calls and saves up to 40%+ on support costs with smart routing.</p>
+      </div>
+      
+      <!-- Enhanced Card 3 -->
+      <div class="feature-card scroll-animate delay-3">
+        <div class="feature-icon icon-green">
+          <i class="fas fa-heart"></i>
+        </div>
+        <h3 class="feature-title">Enhanced CX</h3>
+        <p class="feature-description">Delivers consistent, instant replies that keep customers happy and loyal through personalized interactions.</p>
+      </div>
+      
+      <!-- Enhanced Card 4 -->
+      <div class="feature-card scroll-animate delay-4">
+        <div class="feature-icon icon-cyan">
+          <i class="fas fa-expand-arrows-alt"></i>
+        </div>
+        <h3 class="feature-title">Scalability</h3>
+        <p class="feature-description">Handles any volume with ease — peak time or night time with unlimited concurrent conversations.</p>
+      </div>
+      
+      <!-- Enhanced Card 5 -->
+      <div class="feature-card scroll-animate delay-5">
+        <div class="feature-icon icon-blue">
+          <i class="fas fa-brain"></i>
+        </div>
+        <h3 class="feature-title">Actionable Insights</h3>
+        <p class="feature-description">Surface trending issues and boost your business intelligence automatically with advanced analytics.</p>
+      </div>
+      
+      <!-- Enhanced Card 6 -->
+      <div class="feature-card scroll-animate delay-6">
+        <div class="feature-icon icon-purple">
+          <i class="fas fa-users"></i>
+        </div>
+        <h3 class="feature-title">Agent Empowerment</h3>
+        <p class="feature-description">Frees your agents to focus on what matters most with intelligent task automation and routing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ENHANCED WAVE DIVIDER -->
+<div class="wave-divider" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
+    <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 32C320 -32 800 128 1440 32V0H0V32Z" fill="url(#wave-gradient-2)"/>
+        <defs>
+          <linearGradient id="wave-gradient-2" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#0f0f23;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#1a1a2e;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+    </svg>
+</div>
+
+<!-- ENHANCED HOW IT WORKS SECTION -->
+<section id="how-it-works" class="section-dark py-20">
+  <div class="container mx-auto px-6">
+    <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 text-white scroll-animate">
+      How Our Virtual Assistant Works
+    </h2>
+    <div class="flex flex-col lg:flex-row items-center justify-center gap-12">
+      <!-- Enhanced Video -->
+      <div class="w-full lg:w-1/2 flex justify-center scroll-animate delay-1">
+        <video src="Videos/robo.mp4" class="va-video" autoplay loop muted playsinline poster="https://placehold.co/500x281/181c2e/ffffff?text=Loading..."></video>
+      </div>
+      
+      <!-- Enhanced Features Grid -->
+      <div class="w-full lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="feature-card scroll-animate delay-2">
+          <div class="feature-icon icon-blue">
+            <i class="fas fa-language"></i>
+          </div>
+          <h3 class="feature-title">Next-Gen NLU</h3>
+          <p class="feature-description">Understands language, intent, sentiment—even slang or accents with 99% accuracy.</p>
+        </div>
+        
+        <div class="feature-card scroll-animate delay-3">
+          <div class="feature-icon icon-purple">
+            <i class="fas fa-database"></i>
+          </div>
+          <h3 class="feature-title">Seamless Integration</h3>
+          <p class="feature-description">Pulls live customer & product info from your CRM, ERP & more in real-time.</p>
+        </div>
+        
+        <div class="feature-card scroll-animate delay-4">
+          <div class="feature-icon icon-green">
+            <i class="fas fa-magic"></i>
+          </div>
+          <h3 class="feature-title">Intelligent Automation</h3>
+          <p class="feature-description">Books appointments, processes requests, and kicks off workflows automatically.</p>
+        </div>
+        
+        <div class="feature-card scroll-animate delay-5">
+          <div class="feature-icon icon-cyan">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+          <h3 class="feature-title">Continuous Learning</h3>
+          <p class="feature-description">Learns from every interaction—optimizing responses for better CX continuously.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ENHANCED WAVE DIVIDER -->
+<div class="wave-divider" style="background: var(--dark-gradient);">
+    <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 64C320 128 800 -32 1440 64V100H0V64Z" fill="url(#wave-gradient-3)"/>
+      <defs>
+        <linearGradient id="wave-gradient-3" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#f8fafc;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#e2e8f0;stop-opacity:1" />
+        </linearGradient>
+      </defs>
+    </svg>
+</div>
+
+<!-- ENHANCED SOLUTIONS SECTION -->
+<section id="solutions" class="section-light py-20">
+  <div class="container mx-auto px-6">
+    <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 text-gray-800 scroll-animate">
+      Solving Common Contact Centre Challenges
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Enhanced Challenge Cards -->
+      <div class="flip-card scroll-animate delay-1">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+                         <div class="text-center">
+               <i class="fas fa-lock text-4xl text-red-500 mb-4"></i>
+               <h4 class="text-xl font-semibold text-gray-800 mb-3">"My account is locked."</h4>
+               <span class="block text-gray-600 mb-4 text-sm">Traditional Method</span>
+               <p class="text-gray-700">Lengthy verification, agent wait-times, and frustrating steps.</p>
+             </div>
+          </div>
+          <div class="flip-card-back">
+            <div class="text-center">
+              <i class="fas fa-unlock text-4xl mb-4"></i>
+              <h4 class="text-xl font-semibold mb-4">VA Solution</h4>
+              <p>Step-by-step automated recovery, secure unlock via SMS/email—resolved in seconds!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card scroll-animate delay-2">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+                         <div class="text-center">
+               <i class="fas fa-shipping-fast text-4xl text-blue-500 mb-4"></i>
+               <h4 class="text-xl font-semibold text-gray-800 mb-3">"Where's my order?"</h4>
+               <span class="block text-gray-600 mb-4 text-sm">Traditional Method</span>
+               <p class="text-gray-700">Manual tracking across systems, slow agent response.</p>
+             </div>
+          </div>
+          <div class="flip-card-back">
+            <div class="text-center">
+              <i class="fas fa-map-marker-alt text-4xl mb-4"></i>
+              <h4 class="text-xl font-semibold mb-4">VA Solution</h4>
+              <p>Automatic, real-time updates from integrated logistics—reduces WISMO calls by 40%.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card scroll-animate delay-3">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+                         <div class="text-center">
+               <i class="fas fa-plane text-4xl text-green-500 mb-4"></i>
+               <h4 class="text-xl font-semibold text-gray-800 mb-3">"I need to change my flight."</h4>
+               <span class="block text-gray-600 mb-4 text-sm">Traditional Method</span>
+               <p class="text-gray-700">Manual changes, slow checks, long waits.</p>
+             </div>
+          </div>
+          <div class="flip-card-back">
+            <div class="text-center">
+              <i class="fas fa-calendar-alt text-4xl mb-4"></i>
+              <h4 class="text-xl font-semibold mb-4">VA Solution</h4>
+              <p>Self-serve changes to bookings in chat, real-time policies & confirmations—24/7!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card scroll-animate delay-4">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+                         <div class="text-center">
+               <i class="fas fa-wifi text-4xl text-purple-500 mb-4"></i>
+               <h4 class="text-xl font-semibold text-gray-800 mb-3">"My internet isn't working."</h4>
+               <span class="block text-gray-600 mb-4 text-sm">Traditional Method</span>
+               <p class="text-gray-700">Complex scripts, miscommunication, repeat calls.</p>
+             </div>
+          </div>
+          <div class="flip-card-back">
+            <div class="text-center">
+              <i class="fas fa-tools text-4xl mb-4"></i>
+              <h4 class="text-xl font-semibold mb-4">VA Solution</h4>
+              <p>Interactive, AI-driven diagnostics and instant solutions—or escalate with full context.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card scroll-animate delay-5">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+                         <div class="text-center">
+               <i class="fas fa-file-alt text-4xl text-yellow-500 mb-4"></i>
+               <h4 class="text-xl font-semibold text-gray-800 mb-3">"What docs do I need?"</h4>
+               <span class="block text-gray-600 mb-4 text-sm">Traditional Method</span>
+               <p class="text-gray-700">Generic info, callbacks needed for details, confusion.</p>
+             </div>
+          </div>
+          <div class="flip-card-back">
+            <div class="text-center">
+              <i class="fas fa-list-check text-4xl mb-4"></i>
+              <h4 class="text-xl font-semibold mb-4">VA Solution</h4>
+              <p>Personalized checklists and direct links to forms make applying a breeze.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card scroll-animate delay-6">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+                         <div class="text-center">
+               <i class="fas fa-star text-4xl text-cyan-500 mb-4"></i>
+               <h4 class="text-xl font-semibold text-gray-800 mb-3">"Tell me about new features."</h4>
+               <span class="block text-gray-600 mb-4 text-sm">Traditional Method</span>
+               <p class="text-gray-700">Info not always up to date; inconsistent details.</p>
+             </div>
+          </div>
+          <div class="flip-card-back">
+            <div class="text-center">
+              <i class="fas fa-rocket text-4xl mb-4"></i>
+              <h4 class="text-xl font-semibold mb-4">VA Solution</h4>
+              <p>Up-to-date product knowledge—instantly shared, consistent, and always available.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="text-sm mt-12 text-gray-600 text-center scroll-animate">
+      <i class="fas fa-hand-pointer mr-2"></i>
+      Tap or click each card to reveal the VA-powered solution
+    </p>
+  </div>
+</section>
+
+<!-- ENHANCED CTA SECTION -->
+<section class="section-gradient py-20">
+  <div class="container mx-auto px-6 text-center">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-4xl md:text-6xl font-bold mb-8 scroll-animate">
+        Ready to Transform Your Contact Centre?
+      </h2>
+      <p class="text-xl md:text-2xl mb-12 max-w-3xl mx-auto opacity-90 scroll-animate delay-1">
+        Join leading businesses already leveraging our intelligent VA to deliver stellar support and turbocharge CX.
+      </p>
+             <div class="flex justify-center items-center scroll-animate delay-2">
+         <a href="login.html" class="button-primary">
+           <i class="fas fa-rocket"></i>
+           Start Your Free Trial
+         </a>
+       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ENHANCED FOOTER -->
+<footer class="bg-gray-900 text-white py-12">
+  <div class="container mx-auto px-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      <div class="col-span-1 md:col-span-2">
+        <div class="logo text-2xl mb-4">
+          <i class="fas fa-robot mr-3"></i>
+          VirtualAI
+        </div>
+        <p class="text-gray-400 max-w-md">
+          Transforming customer experience with intelligent AI solutions for the next generation of contact centers.
+        </p>
+      </div>
+      <div>
+        <h4 class="font-semibold mb-4">Product</h4>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="#" class="hover:text-white transition-colors">Features</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Pricing</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Integrations</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-semibold mb-4">Support</h4>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="#" class="hover:text-white transition-colors">Documentation</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Contact Us</a></li>
+          <li><a href="#" class="hover:text-white transition-colors">Status</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+      <p class="text-gray-400 mb-4 md:mb-0">&copy; 2025 VirtualAI. All rights reserved.</p>
+      <div class="flex space-x-6">
+        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+          <i class="fab fa-twitter"></i>
+        </a>
+        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+          <i class="fab fa-linkedin"></i>
+        </a>
+        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+          <i class="fab fa-github"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
