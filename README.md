@@ -41,28 +41,34 @@
 virtual-assistant/
 │
 ├── frontend/
-│ ├── src/
-│ ├── 019808ab-4e08-7793-90e2-8aeeb0fdefd3.glb # 3D Robot Model
-│ ├── App.css
-│ ├── App.js
-│ ├── App.test.js
-│ ├── background.webp
-│ ├── index.css
-│ ├── index.html
-│ ├── index.js
-│ ├── login.html
-│ ├── logo.svg
-│ ├── profile.html
-│ ├── reportWebVitals.js
-│ └── setupTests.js
+│   ├── src/
+│   ├── Videos/
+│   │   ├── back.mp4
+│   │   ├── bg4.mp4
+│   │   └── robo.mp4
+│   ├── App.css
+│   ├── App.js
+│   ├── App.test.js
+│   ├── index.css
+│   ├── index.html
+│   ├── index.js
+│   ├── landing_page.html
+│   ├── live-chatbot.json
+│   ├── login.html
+│   ├── logo.svg
+│   ├── profile.html
+│   ├── reportWebVitals.js
+│   ├── setupTests.js
+│   ├── package.json
+│   └── package-lock.json
 │
 ├── backend/
-│ ├── controllers/
-│ ├── routes/
-│ ├── server.js
-│ ├── serviceAccountKey.json.json
-│ ├── package.json
-│ └── package-lock.json
+│   ├── controllers/
+│   ├── routes/
+│   ├── server.js
+│   ├── serviceAccountKey.json
+│   ├── package.json
+│   └── package-lock.json
 ```
 
 
