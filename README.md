@@ -84,18 +84,22 @@ virtual-assistant/
 
 ---
 
-## 📷 Sample Login Page
+## 📷 Sample Login & Chat Screens
 
-This project features a stylish login interface using Firebase Auth:
-- 3D Robot Model (GLB)
-- Split layout with secure sign-in
-- Real-time auth state detection
+This project features:
 
-![Login Page]
+- 🔐 Stylish Firebase Auth login interface
+  - Split layout with secure sign-in
+  - 3D Robot Model (GLB)
+  - Real-time auth state detection
+- 🤖 Chat interface with AI bot responses
 
+### 🔐 Login Page Animation
+![Login Page](./assets/login.gif)
 
+### 💬 Chat Interface Demo
+![Chat Page](./assets/chat.gif)
 
-<img width="947" height="508" alt="vi" src="https://github.com/user-attachments/assets/a6426db7-2f5e-49d1-ada8-c40359e6bc3e" />
 
 ---
 
