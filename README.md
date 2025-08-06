@@ -90,7 +90,7 @@ This project features:
 
 - 🔐 Stylish Firebase Auth login interface  
   ↳ Split layout with secure sign-in  
-  ↳ 3D Robot Model (GLB)  
+  ↳ 3D Robot Model  
   ↳ Real-time auth state detection
 
 - 🤖 Chat interface with AI bot responses
@@ -117,7 +117,7 @@ This project features:
 - Node.js ≥ 18
 - Ollama (LLaMA 3 & LLaVA models pulled)
 - Firebase project set up
-- GLB-supported 3D rendering enabled in browser
+  
 
 ---
 
