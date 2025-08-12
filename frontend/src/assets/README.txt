@@ -1,0 +1,1 @@
+Place icons, logos, and media here. Example: LinkedIn logo, app logo, optional background images.
